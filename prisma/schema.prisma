@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String           @id @default(cuid())
+  dni             String           @unique @db.Char(8)
+  firstName       String           @db.VarChar(50)
+  lastName        String           @db.VarChar(50)
+  email           String           @unique @db.VarChar(50)
+  telephone       String           @db.VarChar(9)
+  institution     String           @db.VarChar(50)
+  role            Role             @default(PARTICIPANT)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  password        String?
+  inscriptions    Inscription[]
+  userAttendances UserAttendance[]
+  vouchers        Voucher[]
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String   @unique
+  token   String
+  expires DateTime
+}
+
+model Attendance {
+  id              String           @id @default(uuid())
+  date            DateTime         @default(now())
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  cincitEdition   CincitEdition    @default(E2025)
+  attendanceType  AttendanceType
+  attendanceState AttendanceState  @default(hidden)
+  userAttendances UserAttendance[]
+}
+
+model UserAttendance {
+  userId       String
+  attendanceId String
+  date         DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  attendance   Attendance @relation(fields: [attendanceId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@id([userId, attendanceId])
+}
+
+model Voucher {
+  id           String        @id @default(uuid())
+  userId       String
+  publicUrl    String?
+  url          String?
+  imgId        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  inscriptions Inscription[]
+  user         User          @relation(fields: [userId], references: [id])
+}
+
+model Inscription {
+  id              String           @id @default(uuid())
+  userId          String
+  voucherId       String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  inscriptionType InscriptionType  @default(general)
+  state           InscriptionState @default(pending)
+  cincitEdition   CincitEdition    @default(E2025)
+  user            User             @relation(fields: [userId], references: [id])
+  voucher         Voucher          @relation(fields: [voucherId], references: [id])
+}
+
+enum CincitEdition {
+  E2025
+  E2026
+  E2027
+}
+
+enum AttendanceType {
+  entrance
+  exit
+}
+
+enum InscriptionType {
+  general
+}
+
+enum Role {
+  ADMINISTRATOR
+  PARTICIPANT
+  INSCRIBER
+  STAFF
+}
+
+enum InscriptionState {
+  pending
+  approved
+  rejected
+}
+
+enum AttendanceState {
+  visible
+  hidden
+}
