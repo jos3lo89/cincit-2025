@@ -2,6 +2,7 @@ import { string, object, infer } from "zod";
 const envVars = object({
   DATABASE_URL: string(),
   DIRECT_URL: string(),
+  AUTH_SECRET: string(),
 });
 
 envVars.parse(process.env);

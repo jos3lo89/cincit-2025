@@ -4,7 +4,7 @@ export const passwordHashed = async (pass: string) => {
   return await bcrypt.hash(pass, 12);
 };
 
-export const passwordVerify = async (
+export const comparePassword = async (
   password: string,
   hashedPassword: string
 ) => {
