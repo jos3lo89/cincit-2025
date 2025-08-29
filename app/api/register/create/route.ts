@@ -24,14 +24,9 @@ export const POST = async (req: NextRequest) => {
 
     const payload = await verifyToken<JwtRegisterDecoded>(token);
 
-    console.log("Bearer Token recibido:", token);
-
     const formData = await req.formData();
     const body = Object.fromEntries(formData.entries());
     const validatedData = createUserSchema.parse(body);
-
-    console.log("✅ Datos validados listos para usar:", validatedData);
-    console.log("Nombre del archivo:", validatedData.voucher.name);
 
     if (
       payload.purpose !== process.env.PURPOSE_REGISTER ||
@@ -117,8 +112,6 @@ export const POST = async (req: NextRequest) => {
     );
   } catch (error) {
     if (error instanceof ZodError) {
-      console.log(flattenError(error).fieldErrors);
-
       return NextResponse.json(
         {
           message: "Datos inválidos, por favor verifique el formulario.",
