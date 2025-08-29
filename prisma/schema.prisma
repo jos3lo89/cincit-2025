@@ -27,10 +27,11 @@ model User {
 }
 
 model VerificationToken {
-  id      String   @id @default(cuid())
-  email   String   @unique
-  token   String
-  expires DateTime
+  id       String   @id @default(cuid())
+  email    String   @unique
+  token    String
+  expires  DateTime
+  attempts Int      @default(0)
 }
 
 model Attendance {

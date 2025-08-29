@@ -2,13 +2,12 @@ import { auth } from "@/auth";
 import { NextAuthRequest } from "next-auth";
 import { NextResponse } from "next/server";
 import {
+  apiAuthPrefix,
+  authRoutes,
   DEFAULT_LOGIN_REDIRECT,
   protectedRoutesByRole,
   publicRoutes,
 } from "./routes";
-
-const apiAuthPrefix = "/api/auth";
-const authRoutes = ["/signin"];
 
 export default auth((req: NextAuthRequest) => {
   const { nextUrl } = req;
@@ -16,7 +15,11 @@ export default auth((req: NextAuthRequest) => {
   const userRole = req.auth?.user?.role;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  // const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isPublicRoute = publicRoutes.some((route) =>
+    nextUrl.pathname.startsWith(route)
+  );
+
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   if (isApiAuthRoute) {

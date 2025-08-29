@@ -1,4 +1,8 @@
-export const publicRoutes: string[] = [];
+export const publicRoutes: string[] = [
+  "/api/register/send-otp",
+  "/api/register/verify-otp",
+  "/api/register/create", // TODO: mejorar aparte
+];
 
 export const authRoutes: string[] = ["/signin"];
 
