@@ -4,7 +4,7 @@ import {
   CincitEdition,
   PrismaClient,
   Role,
-} from "@/app/generated/prisma";
+} from "@prisma/client";
 import { passwordHashed } from "@/lib/bcrypt";
 
 import { faker } from "@faker-js/faker";

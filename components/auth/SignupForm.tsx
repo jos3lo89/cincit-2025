@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Role } from "@/app/generated/prisma";
 import { useState, useTransition } from "react";
 import { signUpSchema, SignUpType } from "@/schemas/auth.schema";
 import { useForm } from "react-hook-form";
@@ -25,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signupAction } from "@/actions/auth.action";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Role } from "@prisma/client";
 
 const SignupForm = () => {
   const [error, setError] = useState<string | null>(null);
