@@ -1,4 +1,4 @@
-import { Role } from "@/app/generated/prisma";
+import { Role } from "@prisma/client";
 import { object, string, email, enum as enumz, infer as inferz } from "zod";
 
 export const signInSchema = object({

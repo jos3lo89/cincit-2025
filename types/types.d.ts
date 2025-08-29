@@ -22,7 +22,7 @@ declare module "next-auth" {
   }
 }
 
-import { Role } from "@/app/generated/prisma";
+import { Role } from "@prisma/client";
 import { DefaultSession } from "next-auth";
 // The `JWT` interface can be found in the `next-auth/jwt` submodule
 import { JWT } from "next-auth/jwt";
