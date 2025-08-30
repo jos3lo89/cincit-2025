@@ -1,3 +1,4 @@
+import AttendanceCallPage from "@/app/(admin)/attendance/call/page";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,6 +18,14 @@ export async function GET(
           },
         },
       },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        dni: true,
+        email: true,
+        institution: true,
+      },
     });
 
     if (!user) {
@@ -26,7 +35,21 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(user);
+    const activeAttendances = await prisma.attendance.findMany({
+      where: {
+        attendanceState: "visible",
+      },
+      select: {
+        id: true,
+        date: true,
+        attendanceType: true,
+      },
+    });
+
+    return NextResponse.json({
+      user,
+      attendances: activeAttendances,
+    });
   } catch (error) {
     console.log("error: /api/attendance/find-by-dni/:dni", error);
     return NextResponse.json(
