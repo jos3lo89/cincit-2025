@@ -1,10 +1,7 @@
 import prisma from "@/lib/prisma";
+import { changeStateAttendance } from "@/schemas/attendance.schema";
 import { NextRequest, NextResponse } from "next/server";
-import z from "zod";
-
-const formSchema = z.object({
-  attendanceState: z.enum(["visible", "hidden"]),
-});
+import { flattenError, ZodError } from "zod";
 
 export const PUT = async (
   req: NextRequest,
@@ -14,26 +11,31 @@ export const PUT = async (
     const { id } = await params;
     const body = await req.json();
 
-    const result = formSchema.safeParse(body);
+    const { attendanceState } = changeStateAttendance.parse(body);
 
-    if (!result.success) {
-      return NextResponse.json({ message: "Invalid data" }, { status: 400 });
-    }
-
-    const { attendanceState } = result.data;
-
-    await prisma.attendance.update({
+    const updatedAttendance = await prisma.attendance.update({
       where: {
         id,
       },
       data: {
-        attendanceState: attendanceState == "visible" ? "hidden" : "visible",
+        attendanceState,
       },
     });
 
-    return NextResponse.json({ message: "ok" });
+    return NextResponse.json(updatedAttendance);
   } catch (error) {
-    console.log("Error en /api/attendance/control/:id", error);
+    if (error instanceof ZodError) {
+      console.log("ZodError: ", flattenError(error).fieldErrors);
+
+      return NextResponse.json(
+        {
+          message: "Datos invalidos intentelo de nuevo.",
+        },
+        { status: 400 }
+      );
+    }
+
+    console.error("Error en /api/attendance/control/:id", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

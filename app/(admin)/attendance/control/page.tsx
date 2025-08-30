@@ -1,92 +1,82 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn, LogOut, Power, PowerOff } from "lucide-react";
+import AttendanceDayCard from "@/components/attendance/AttendanceDayCard";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { AttendanceI } from "@/interfaces/attendance.interface";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export interface Attendance {
-  id: number;
-  date: string;
-  createdAt: string;
-  updatedAt: string;
-  cincitEdition: string;
-  attendanceType: "entrance" | "exit";
-  attendanceState: "visible" | "hidden";
-}
-
 const AttendanceControlPage = () => {
-  const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);
-  const [loadingButtons, setLoadingButtons] = useState<Set<number>>(new Set());
+  const [attendanceData, setAttendanceData] = useState<AttendanceI[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState<Set<string>>(new Set());
 
   const getAttendance = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/attendance/control");
       if (!res.ok) {
-        throw new Error("No se pudo obtener los registros de asistencia.");
+        throw new Error("No se pudo obtener las asistencias.");
       }
-      const data = await res.json();
+      const data: AttendanceI[] = await res.json();
       setAttendanceData(data);
     } catch (error) {
       if (error instanceof Error) {
+        setError(error.message);
         toast.error(error.message);
       } else {
-        toast.error("Error al obtener los registros de asistencia.");
+        setError("Error: obteniendo asistencias");
+        console.error("Error fetching attendance data:", error);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    getAttendance();
-  }, []);
+  const toggleAttendanceState = async (
+    id: string,
+    currentState: "visible" | "hidden"
+  ) => {
+    setIsUpdating((prev) => new Set(prev).add(id));
 
-  // Agrupar registros por fecha
-  const groupedByDate = attendanceData.reduce((groups, record) => {
-    const date = new Date(record.date).toISOString().split("T")[0];
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(record);
-    return groups;
-  }, {} as Record<string, Attendance[]>);
-
-  // Ordenar las fechas de forma consistente
-  const sortedGroupedByDate = Object.entries(groupedByDate)
-    .sort(
-      ([dateA], [dateB]) =>
-        new Date(dateA).getTime() - new Date(dateB).getTime()
-    )
-    .reduce((acc, [date, records]) => {
-      // Ordenar registros dentro de cada fecha por ID para mantener orden consistente
-      acc[date] = records.sort((a, b) => a.id - b.id);
-      return acc;
-    }, {} as Record<string, Attendance[]>);
-
-  // Función para cambiar el estado (solo imprime el ID como solicitaste)
-  const toggleAttendanceState = async (id: number, currentState: string) => {
-    setLoadingButtons((prev) => new Set(prev).add(id));
-
+    const loadingToast = toast.loading("Actualizando estado de asistencia...");
     try {
+      const newState = currentState === "visible" ? "hidden" : "visible";
       const res = await fetch(`/api/attendance/control/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
-          attendanceState: currentState,
+          attendanceState: newState,
         }),
       });
+
       if (!res.ok) {
         throw new Error("No se pudo cambiar el estado de la asistencia.");
       }
-      await getAttendance();
-    } catch (error) {
-      console.log(error);
+
+      setAttendanceData((prevData) =>
+        prevData.map((day) => {
+          if (day.entrance && day.entrance.id === id) {
+            return {
+              ...day,
+              entrance: { ...day.entrance, attendanceState: newState },
+            };
+          }
+          if (day.exit && day.exit.id === id) {
+            return { ...day, exit: { ...day.exit, attendanceState: newState } };
+          }
+          return day;
+        })
+      );
+      toast.dismiss(loadingToast);
+    } catch (err) {
+      toast.dismiss(loadingToast);
+      console.error("Error: en cambiar de estado.");
       toast.error("Error al cambiar el estado de la asistencia");
     } finally {
-      setLoadingButtons((prev) => {
+      setIsUpdating((prev) => {
         const newSet = new Set(prev);
         newSet.delete(id);
         return newSet;
@@ -94,14 +84,44 @@ const AttendanceControlPage = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+  useEffect(() => {
+    getAttendance();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container max-w-3xl mx-auto p-4 space-y-4">
+        <h4 className="text-xl font-bold text-center">
+          Control de Asistencias
+        </h4>
+        <div className="space-y-4">
+          <Skeleton className="h-[120px] w-full" />
+          <Skeleton className="h-[120px] w-full" />
+          <Skeleton className="h-[120px] w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container max-w-3xl mx-auto p-4 text-center text-red-500">
+        <h4 className="text-xl font-bold mb-2">Error</h4>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (attendanceData.length === 0) {
+    return (
+      <div className="container max-w-3xl mx-auto p-4 text-center">
+        <h4 className="text-xl font-bold mb-2">
+          No hay Asistencias Disponibles
+        </h4>
+        <p>Parece que no hay registros de asistencia para mostrar.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-3xl mx-auto p-2 ">
@@ -109,94 +129,16 @@ const AttendanceControlPage = () => {
         <h4 className="text-xl font-bold mb-2">Control de Asistencias</h4>
       </div>
 
-      <div className="space-y-6">
-        {Object.entries(sortedGroupedByDate).map(([date, records]) => (
-          <Card key={date} className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-xl">
-                {formatDate(records[0].date)}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {records.map((record) => (
-                  <div key={record.id}>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        {record.attendanceType === "entrance" ? (
-                          <LogIn className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <LogOut className="w-5 h-5 text-red-600" />
-                        )}
-                        <span className="font-semibold capitalize">
-                          {record.attendanceType === "entrance"
-                            ? "Entrada"
-                            : "Salida"}
-                        </span>
-                      </div>
-                      <Badge
-                        variant={
-                          record.attendanceState === "visible"
-                            ? "default"
-                            : "secondary"
-                        }
-                        className={
-                          record.attendanceState === "visible"
-                            ? "bg-green-100 text-green-800 hover:bg-green-200"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }
-                      >
-                        {record.attendanceState === "visible"
-                          ? "Activo"
-                          : "Inactivo"}
-                      </Badge>
-                    </div>
-
-                    <Button
-                      onClick={() =>
-                        toggleAttendanceState(record.id, record.attendanceState)
-                      }
-                      variant={
-                        record.attendanceState === "visible"
-                          ? "destructive"
-                          : "default"
-                      }
-                      size="sm"
-                      className="w-full cursor-pointer"
-                      disabled={loadingButtons.has(record.id)}
-                    >
-                      {loadingButtons.has(record.id) ? (
-                        <>
-                          <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                          Procesando...
-                        </>
-                      ) : record.attendanceState === "visible" ? (
-                        <>
-                          <PowerOff className="w-4 h-4 mr-2" />
-                          Desactivar
-                        </>
-                      ) : (
-                        <>
-                          <Power className="w-4 h-4 mr-2" />
-                          Activar
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+      <div className="space-y-4">
+        {attendanceData.map((day, index) => (
+          <AttendanceDayCard
+            key={index}
+            day={day}
+            isUpdating={isUpdating}
+            onToggleState={toggleAttendanceState}
+          />
         ))}
       </div>
-
-      {attendanceData.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
-            No hay registros de asistencia disponibles
-          </p>
-        </div>
-      )}
     </div>
   );
 };
