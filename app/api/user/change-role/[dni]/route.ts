@@ -57,10 +57,12 @@ export const PUT = async (
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { dni: string } }
+  { params }: { params: Promise<{ dni: string }> }
 ) => {
   try {
-    const { dni } = searchByDni.parse(params);
+    const param = await params;
+
+    const { dni } = searchByDni.parse(param);
 
     const user = await prisma.user.findUnique({
       where: { dni },
