@@ -91,9 +91,6 @@ const AttendanceControlPage = () => {
   if (loading) {
     return (
       <div className="container max-w-3xl mx-auto p-4 space-y-4">
-        <h4 className="text-xl font-bold text-center">
-          Control de Asistencias
-        </h4>
         <div className="space-y-4">
           <Skeleton className="h-[120px] w-full" />
           <Skeleton className="h-[120px] w-full" />
@@ -125,10 +122,6 @@ const AttendanceControlPage = () => {
 
   return (
     <div className="container max-w-3xl mx-auto p-2 ">
-      <div className="mb-3 text-center">
-        <h4 className="text-xl font-bold mb-2">Control de Asistencias</h4>
-      </div>
-
       <div className="space-y-4">
         {attendanceData.map((day, index) => (
           <AttendanceDayCard
