@@ -70,7 +70,7 @@ const AllInscriptionsPage = () => {
   };
 
   return (
-    <div className=" ">
+    <>
       <div>
         <h4 className="text-xl sm:text-2xl font-semibold">
           Total de inscritos
@@ -130,7 +130,7 @@ const AllInscriptionsPage = () => {
           </Button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 export default AllInscriptionsPage;

@@ -65,7 +65,7 @@ export const sideBarData = {
         icon: NotebookTabs,
         items: [
           {
-            title: "Asistentes",
+            title: "Reporticitos",
             url: "/report",
           },
         ],

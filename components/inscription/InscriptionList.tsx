@@ -36,13 +36,6 @@ import { ImageModal } from "./ImageModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PacmanLoader } from "react-spinners";
 import type { Inscription } from "@/interfaces/inscription.interface";
@@ -58,7 +51,6 @@ interface LoadingActions {
   rejecting: number | null;
 }
 
-// Simple debounce utility
 const debounce = (func: (...args: any[]) => void, delay: number) => {
   let timeoutId: NodeJS.Timeout;
   return (...args: any[]) => {
@@ -267,7 +259,6 @@ const InscriptionList = ({
 
   return (
     <div className="w-full p-4 space-y-6">
-      {/* Search and View Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -403,7 +394,6 @@ const InscriptionList = ({
           </div> */}
         </div>
       ) : (
-        /* Card View - Mobile Optimized */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
           {table.getFilteredRowModel().rows.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground col-span-full">
@@ -417,31 +407,30 @@ const InscriptionList = ({
                   key={inscription.id}
                   className="w-full shadow-sm hover:shadow-md transition-shadow duration-300"
                 >
-                  <CardHeader className="pb-3">
+                  <CardHeader>
                     <div className="flex items-center justify-between gap-3">
                       <CardTitle className="text-lg font-bold">
-                        Inscripción #{inscription.id}
+                        <Badge
+                          variant={
+                            inscription.state === "approved"
+                              ? "default"
+                              : inscription.state === "rejected"
+                              ? "destructive"
+                              : "secondary"
+                          }
+                          className="flex items-center gap-1 whitespace-nowrap"
+                        >
+                          {inscription.state === "approved" ? (
+                            <CheckCircle className="h-3 w-3" />
+                          ) : inscription.state === "rejected" ? (
+                            <XCircle className="h-3 w-3" />
+                          ) : (
+                            <XCircle className="h-3 w-3" />
+                          )}
+                          {inscription.state.charAt(0).toUpperCase() +
+                            inscription.state.slice(1)}
+                        </Badge>
                       </CardTitle>
-                      <Badge
-                        variant={
-                          inscription.state === "approved"
-                            ? "default"
-                            : inscription.state === "rejected"
-                            ? "destructive"
-                            : "secondary"
-                        }
-                        className="flex items-center gap-1 whitespace-nowrap"
-                      >
-                        {inscription.state === "approved" ? (
-                          <CheckCircle className="h-3 w-3" />
-                        ) : inscription.state === "rejected" ? (
-                          <XCircle className="h-3 w-3" />
-                        ) : (
-                          <XCircle className="h-3 w-3" />
-                        )}
-                        {inscription.state.charAt(0).toUpperCase() +
-                          inscription.state.slice(1)}
-                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-4">
