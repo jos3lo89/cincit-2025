@@ -1,4 +1,4 @@
-import { AttendanceType } from "@prisma/client";
+import { AttendanceType, Role } from "@prisma/client";
 
 export interface UserI {
   id: string;
@@ -13,4 +13,14 @@ export interface AttendanceI {
   id: string;
   date: string;
   attendanceType: AttendanceType;
+}
+
+export interface UserInterfaceI {
+  id: string;
+  dni: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  telephone: string;
+  role: Role;
 }

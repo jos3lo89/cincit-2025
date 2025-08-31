@@ -42,6 +42,10 @@ export const sideBarData = {
         isActive: true,
         items: [
           {
+            title: "Buscar",
+            url: "/inscription/search",
+          },
+          {
             title: "Todos",
             url: "/inscription/all",
           },

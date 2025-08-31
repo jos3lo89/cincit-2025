@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import z from "zod";
 
 export const searchByDni = z.object({
@@ -5,3 +6,9 @@ export const searchByDni = z.object({
 });
 
 export type searchByDnitype = z.infer<typeof searchByDni>;
+
+export const formRoleSchema = z.object({
+  role: z.enum(Role),
+});
+
+export type FormRoleData = z.infer<typeof formRoleSchema>;

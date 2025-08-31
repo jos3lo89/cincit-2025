@@ -33,29 +33,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Role } from "@prisma/client";
-
-export interface UserInterface {
-  id: string;
-  dni: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  telephone: string;
-  role: "ADMINISTRATOR" | "PARTICIPANT" | "INSCRIBER" | "STAFF";
-}
-
-const formSchema = z.object({
-  dni: z
-    .string()
-    .min(8, "El DNI debe tener 8 dígitos")
-    .max(8, "El DNI debe tener 8 dígitos"),
-});
-type FormData = z.infer<typeof formSchema>;
-
-const formRoleSchema = z.object({
-  role: z.enum(z.nativeEnum(Role).options),
-});
-type FormRoleData = z.infer<typeof formRoleSchema>;
+import { UserInterfaceI } from "@/interfaces/user.interface";
+import {
+  FormRoleData,
+  formRoleSchema,
+  searchByDni,
+  searchByDnitype,
+} from "@/schemas/user.schema";
 
 const roleLabels = {
   ADMINISTRATOR: "Administrador",
@@ -72,17 +56,16 @@ const roleColors = {
 } as const;
 
 const ChangeRolePage = () => {
-  const [user, setUser] = useState<UserInterface | null>(null);
+  const [user, setUser] = useState<UserInterfaceI | null>(null);
   const [searchAttempted, setSearchAttempted] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset: resetSearch,
-    watch,
     formState: { errors, isSubmitting: isSearching },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  } = useForm<searchByDnitype>({
+    resolver: zodResolver(searchByDni),
     defaultValues: { dni: "" },
   });
 
@@ -99,7 +82,6 @@ const ChangeRolePage = () => {
   });
 
   const selectedRole = watchRole("role");
-  const dniValue = watch("dni");
 
   useEffect(() => {
     if (user) {
@@ -107,7 +89,7 @@ const ChangeRolePage = () => {
     }
   }, [user, setRoleValue]);
 
-  const fetchUser = async (values: FormData) => {
+  const fetchUser = async (values: searchByDnitype) => {
     setSearchAttempted(true);
     const loadingToast = toast.loading("Buscando usuario...");
     try {
@@ -121,7 +103,7 @@ const ChangeRolePage = () => {
       const data = await res.json();
       setUser(data);
       toast.dismiss(loadingToast);
-      toast.success("Usuario encontrado.");
+      // toast.success("Usuario encontrado.");
     } catch (error) {
       toast.dismiss(loadingToast);
       console.error(error);
@@ -151,7 +133,6 @@ const ChangeRolePage = () => {
     try {
       const res = await fetch(`/api/user/change-role/${user.dni}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: values.role }),
       });
 
@@ -189,7 +170,7 @@ const ChangeRolePage = () => {
   };
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 space-y-8">
+    <div className="container max-w-2xl mx-auto p-4 space-y-2">
       <Card className="rounded-lg shadow-lg">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">
