@@ -48,7 +48,7 @@ export function ImageModal({ imagePath, altText }: ImageModalProps) {
               altText={altText}
               imagePath={imagePath}
               height={600}
-              width={800}
+              width={400}
             />
           </div>
         </div>

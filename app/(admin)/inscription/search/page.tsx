@@ -1,11 +1,33 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import type {
   CincitEdition,
   InscriptionState,
   InscriptionType,
 } from "@prisma/client";
-import { useState, useEffect } from "react";
+import { Search, Eye, RotateCcw, Loader } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import Image from "next/image";
 
 type InscriptionWithUser = {
   id: string;
@@ -30,113 +52,250 @@ type InscriptionWithUser = {
     imgId: string;
   };
 };
-const SearchInscriptionPage = () => {
-  // Estado para guardar lo que el usuario escribe en el input.
-  const [searchTerm, setSearchTerm] = useState("");
-  // Estado para guardar los resultados que vienen de la API.
-  const [results, setResults] = useState<InscriptionWithUser[]>([]);
-  // Estado para mostrar un indicador de carga mientras se busca.
-  const [isLoading, setIsLoading] = useState(false);
 
-  // El hook useEffect es el corazón del "debouncing".
-  // Se ejecuta cada vez que 'searchTerm' cambia.
-  useEffect(() => {
-    // Si el campo de búsqueda está vacío, limpiamos los resultados y no hacemos nada más.
-    if (searchTerm.trim() === "") {
-      setResults([]);
+const SearchInscriptionPage = () => {
+  const [results, setResults] = useState<InscriptionWithUser[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+  const [modalImageLoading, setModalImageLoading] = useState(false);
+
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<{ query: string }>({
+    defaultValues: {
+      query: "",
+    },
+  });
+
+  const onSubmit = async (values: { query: string }) => {
+    if (!values.query.trim()) {
+      toast.error("Por favor ingresa un término de búsqueda");
       return;
     }
 
-    setIsLoading(true);
+    const loadingToast = toast.loading("Buscando participante...");
 
-    // Creamos el temporizador.
-    const delayDebounceFn = setTimeout(() => {
-      // Función asíncrona para llamar a nuestra API.
-      const fetchInscriptions = async () => {
-        try {
-          // Hacemos la petición a nuestra API, pasando el término de búsqueda.
-          const response = await fetch(
-            `/api/inscription/search?q=${searchTerm}`
-          );
-          const data = await response.json();
-          setResults(data);
-        } catch (error) {
-          console.error("Error al obtener los datos:", error);
-          setResults([]); // En caso de error, limpiar resultados
-        } finally {
-          setIsLoading(false);
-        }
-      };
+    try {
+      const response = await fetch(
+        `/api/inscription/search?q=${encodeURIComponent(values.query)}`
+      );
 
-      fetchInscriptions();
-    }, 500); // 500ms de espera
+      if (!response.ok) {
+        throw new Error("Error en la búsqueda");
+      }
 
-    // Esta es la función de limpieza de useEffect.
-    // Se ejecuta ANTES de la siguiente ejecución del efecto, o cuando el componente se desmonta.
-    // Aquí cancelamos el temporizador anterior si el usuario sigue escribiendo.
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]); // El efecto depende SOLAMENTE de 'searchTerm'
+      const data = await response.json();
+      setResults(data);
+
+      if (data.length === 0) {
+        toast.info("No se encontraron resultados");
+      } else {
+        toast.success(`Se encontraron ${data.length} resultado(s)`);
+      }
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+      toast.error("Error al realizar la búsqueda");
+      setResults([]);
+    } finally {
+      toast.dismiss(loadingToast);
+    }
+  };
+
+  const handleReset = () => {
+    reset();
+    setResults([]);
+    toast.info("Búsqueda reiniciada");
+  };
+
+  const handleImageLoad = (inscriptionId: string) => {
+    setImageLoading((prev) => ({ ...prev, [inscriptionId]: false }));
+  };
+
+  const handleImageError = (inscriptionId: string) => {
+    setImageLoading((prev) => ({ ...prev, [inscriptionId]: false }));
+  };
+
+  const openImageModal = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setModalImageLoading(true);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+    setModalImageLoading(false);
+  };
+
+  const getStateVariant = (state: InscriptionState) => {
+    switch (state) {
+      case "approved":
+        return "default";
+      case "pending":
+        return "secondary";
+      case "rejected":
+        return "destructive";
+      default:
+        return "outline";
+    }
+  };
+
+  const getStateLabel = (state: InscriptionState) => {
+    switch (state) {
+      case "approved":
+        return "Aprobado";
+      case "pending":
+        return "Pendiente";
+      case "rejected":
+        return "Rechazado";
+      default:
+        return state;
+    }
+  };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Buscar Participante</h1>
-        <p className="mb-6">
-          Ingresa DNI, nombre, apellido o teléfono para encontrar una
-          inscripción.
-        </p>
-
-        <div className="relative">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar por DNI, nombre, teléfono..."
-            className="w-full px-4 py-3 text-lg border  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
-          />
-          {isLoading && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <div className="w-6 h-6 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+      <div className="mb-8">
+        <div className="max-w-2xl">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2">
+            <div className="flex-1">
+              <Input
+                type="text"
+                {...register("query", {
+                  required: "El campo de búsqueda es requerido",
+                  minLength: {
+                    value: 2,
+                    message: "Mínimo 2 caracteres",
+                  },
+                })}
+                placeholder="Buscar por DNI, nombre, apellido, teléfono o email..."
+                className="w-full"
+              />
+              {errors.query && (
+                <p className="text-sm text-destructive mt-1">
+                  {errors.query.message}
+                </p>
+              )}
             </div>
-          )}
-        </div>
 
-        <div className="mt-8">
-          {results.length > 0 ? (
-            <ul className="space-y-4">
-              {results.map((inscription) => (
-                <li
-                  key={inscription.id}
-                  className="p-4 rounded-lg shadow-md border"
-                >
-                  <p className="font-bold text-xl ">
-                    {inscription.user.firstName} {inscription.user.lastName}
-                  </p>
-                  <p className="">DNI: {inscription.user.dni}</p>
-                  <p className="">Teléfono: {inscription.user.telephone}</p>
-                  <p className="">Email: {inscription.user.email}</p>
-                  <span
-                    className={`inline-block mt-2 px-3 py-1 text-sm font-semibold rounded-full ${
-                      inscription.state === "approved"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    Estado: {inscription.state}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            searchTerm.trim() !== "" &&
-            !isLoading && (
-              <p className="text-center text-gray-500 mt-10">
-                No se encontraron resultados.
-              </p>
-            )
-          )}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <Loader className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
+              <span className="sr-only">Buscar</span>
+            </Button>
+
+            <Button type="button" variant="outline" onClick={handleReset}>
+              <RotateCcw className="h-4 w-4" />
+              <span className="sr-only">Resetear</span>
+            </Button>
+          </form>
         </div>
       </div>
+
+      {results.length > 0 && (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>#</TableHead>
+                <TableHead>Nombre Completo</TableHead>
+                <TableHead>DNI</TableHead>
+                <TableHead>Teléfono</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Voucher</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {results.map((inscription, i) => (
+                <TableRow key={inscription.id}>
+                  <TableCell>{i + 1}</TableCell>
+                  <TableCell className="font-medium">
+                    {inscription.user.firstName} {inscription.user.lastName}
+                  </TableCell>
+                  <TableCell>{inscription.user.dni}</TableCell>
+                  <TableCell>{inscription.user.telephone}</TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {inscription.user.email}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStateVariant(inscription.state)}>
+                      {getStateLabel(inscription.state)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        openImageModal(inscription.voucher.publicUrl)
+                      }
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">Ver imagen completa</span>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      {results.length === 0 && !isSubmitting && (
+        <div className="text-center py-12">
+          <div className="text-muted-foreground">
+            <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg">
+              Realiza una búsqueda para ver los resultados
+            </p>
+            <p className="text-sm">
+              Puedes buscar por DNI, nombre, apellido, teléfono o email
+            </p>
+          </div>
+        </div>
+      )}
+
+      <Dialog open={!!selectedImage} onOpenChange={closeImageModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Imagen del Voucher</DialogTitle>
+            <DialogDescription></DialogDescription>
+          </DialogHeader>
+          <div>
+            {modalImageLoading && (
+              <div className="inset-0 flex items-center justify-center">
+                <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            )}
+            {selectedImage && (
+              <>
+                {/* <MyImage
+                  altText="Voucher completo"
+                  imagePath={selectedImage || "/placeholder.svg"}
+                  height={200}
+                  width={300}
+                /> */}
+                <Image
+                  src={selectedImage || "/placeholder.svg"}
+                  alt="Voucher completo"
+                  height={600}
+                  width={400}
+                  className="w-auto h-auto rounded-lg"
+                  onLoad={() => setModalImageLoading(false)}
+                  onError={() => setModalImageLoading(false)}
+                />
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
