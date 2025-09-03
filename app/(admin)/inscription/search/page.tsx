@@ -1,14 +1,8 @@
+// Tu ruta original, por ejemplo: src/app/admin/search/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -27,7 +21,7 @@ import { Search, Eye, RotateCcw, Loader } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Image from "next/image";
+import { ImageVoucherModal } from "@/components/ImageVoucherModal";
 
 type InscriptionWithUser = {
   id: string;
@@ -55,11 +49,10 @@ type InscriptionWithUser = {
 
 const SearchInscriptionPage = () => {
   const [results, setResults] = useState<InscriptionWithUser[]>([]);
+  // El único estado necesario para el modal es saber qué imagen mostrar
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>(
-    {}
-  );
-  const [modalImageLoading, setModalImageLoading] = useState(false);
+
+  // 2. ELIMINAMOS los estados 'imageLoading' y 'modalImageLoading' que ya no son necesarios aquí
 
   const {
     handleSubmit,
@@ -112,22 +105,13 @@ const SearchInscriptionPage = () => {
     toast.info("Búsqueda reiniciada");
   };
 
-  const handleImageLoad = (inscriptionId: string) => {
-    setImageLoading((prev) => ({ ...prev, [inscriptionId]: false }));
-  };
-
-  const handleImageError = (inscriptionId: string) => {
-    setImageLoading((prev) => ({ ...prev, [inscriptionId]: false }));
-  };
-
+  // 3. SIMPLIFICAMOS las funciones para abrir y cerrar el modal
   const openImageModal = (imageUrl: string) => {
     setSelectedImage(imageUrl);
-    setModalImageLoading(true);
   };
 
   const closeImageModal = () => {
     setSelectedImage(null);
-    setModalImageLoading(false);
   };
 
   const getStateVariant = (state: InscriptionState) => {
@@ -262,40 +246,7 @@ const SearchInscriptionPage = () => {
         </div>
       )}
 
-      <Dialog open={!!selectedImage} onOpenChange={closeImageModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Imagen del Voucher</DialogTitle>
-            <DialogDescription></DialogDescription>
-          </DialogHeader>
-          <div>
-            {modalImageLoading && (
-              <div className="inset-0 flex items-center justify-center">
-                <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-            )}
-            {selectedImage && (
-              <>
-                {/* <MyImage
-                  altText="Voucher completo"
-                  imagePath={selectedImage || "/placeholder.svg"}
-                  height={200}
-                  width={300}
-                /> */}
-                <Image
-                  src={selectedImage || "/placeholder.svg"}
-                  alt="Voucher completo"
-                  height={600}
-                  width={400}
-                  className="w-auto h-auto rounded-lg"
-                  onLoad={() => setModalImageLoading(false)}
-                  onError={() => setModalImageLoading(false)}
-                />
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ImageVoucherModal imageUrl={selectedImage} onClose={closeImageModal} />
     </div>
   );
 };

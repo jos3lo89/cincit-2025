@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Eye } from "lucide-react";
+import { X, Eye, ExternalLink } from "lucide-react";
 import MyImage from "../MyImage";
 
 interface ImageModalProps {
@@ -25,7 +25,6 @@ export function ImageModal({ imagePath, altText }: ImageModalProps) {
         className="flex items-center gap-2 bg-transparent"
       >
         <Eye className="h-4 w-4" />
-        Ver Imagen
       </Button>
 
       {isOpen && (
@@ -34,6 +33,16 @@ export function ImageModal({ imagePath, altText }: ImageModalProps) {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={closeModal}
           />
+          <Button
+            className="absolute top-6 right-20 z-20 "
+            asChild
+            size="sm"
+            variant="default"
+          >
+            <a href={imagePath} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </Button>
           <Button
             onClick={closeModal}
             variant="destructive"

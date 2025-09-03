@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 import { Entrance, Exit } from "@/interfaces/attendance.interface";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 interface AttendanceData {
   date: string;
@@ -34,7 +36,9 @@ const AttendanceDayCard: React.FC<AttendanceDayCardProps> = ({
   return (
     <Card className="rounded-lg shadow-md">
       <CardHeader>
-        <CardTitle>{`Fecha: ${day.date}`}</CardTitle>
+        <CardTitle>
+          {`Fecha: ${new Date(day.date).toLocaleDateString("es-PE")}`}
+        </CardTitle>
         <CardDescription>
           Registro de asistencia para la entrada y salida del día.
         </CardDescription>

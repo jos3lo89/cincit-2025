@@ -68,7 +68,7 @@ const InscriptionList = ({
     approving: null,
     rejecting: null,
   });
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "card">("table");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -80,9 +80,9 @@ const InscriptionList = ({
     []
   );
 
-  useEffect(() => {
-    debouncedSetGlobalFilter(searchQuery);
-  }, [searchQuery, debouncedSetGlobalFilter]);
+  // useEffect(() => {
+  //   debouncedSetGlobalFilter(searchQuery);
+  // }, [searchQuery, debouncedSetGlobalFilter]);
 
   const onAction = async (id: number, state: "approved" | "rejected") => {
     if (state === "approved") {
@@ -260,7 +260,7 @@ const InscriptionList = ({
   return (
     <div className="w-full p-4 space-y-6">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md w-full">
+        {/* <div className="relative flex-1 max-w-md w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <label htmlFor="search" className="sr-only"></label>
           <Input
@@ -281,7 +281,7 @@ const InscriptionList = ({
               <X className="h-4 w-4 text-muted-foreground" />
             </Button>
           )}
-        </div>
+        </div> */}
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
             <Button

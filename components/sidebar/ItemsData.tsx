@@ -1,8 +1,8 @@
 import { UserPlus, Home, NotebookTabs, Bot } from "lucide-react";
 
 export const organization = {
-  name: "Cincit 2025",
-  description: "Congreso tenologico",
+  name: "Cincit",
+  description: "Edición 2025",
   logo: "/robot.webp",
 };
 
@@ -32,6 +32,10 @@ export const sideBarData = {
           {
             title: "Control de asistencia",
             url: "/attendance/control",
+          },
+          {
+            title: "Crear asistencia",
+            url: "/attendance/create",
           },
         ],
       },
