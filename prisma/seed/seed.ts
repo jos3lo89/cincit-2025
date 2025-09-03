@@ -88,7 +88,7 @@ async function attendanceCreate() {
 
 async function main() {
   console.log("¡Seeding inicializado con éxito!");
-  await userRegister();
+  // await userRegister();
   await attendanceCreate();
   console.log("¡Seeding finalizado con éxito!");
 }
