@@ -92,6 +92,7 @@ export const POST = async (req: NextRequest) => {
           publicUrl: publicUrl,
           imgId: uploadData.id,
           userId: newUser.id,
+          numTicket: validatedData.numTicket,
         },
       });
 
