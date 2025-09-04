@@ -23,6 +23,9 @@ export const createUserSchema = z.object({
   lastName: z.string().min(1, "El apellido es requerido."),
   institution: z.string().min(1, "La institución es requerida."),
   dni: z.string().regex(/^\d{8}$/, "El DNI debe tener 8 dígitos."),
+  numTicket: z
+    .string()
+    .regex(/^\d{8}$/, "El codigo de voucher debe tener 8 dígitos."),
   email: z.email("Correo electrónico no válido."),
   telephone: z.string().regex(/^\d{9}$/, "El teléfono debe tener 9 dígitos."),
   voucher: z

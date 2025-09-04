@@ -46,7 +46,35 @@ const PendingRejectedPage = () => {
     setCurrentPage(page);
   };
 
+  // const handleAction = async (id: number, state: string) => {
+  //   const isLoading = toast.loading("Cambiando estado...");
+  //   try {
+  //     const res = await fetch(
+  //       `/api/inscription/action?id=${id}&state=${state}`
+  //     );
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       throw new Error(
+  //         data.message || "Error canbiar el estado de la inscripción"
+  //       );
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       toast.error(error.message);
+  //     } else {
+  //       toast.error("Error en la solicitud");
+  //     }
+  //   } finally {
+  //     fetchInscriptions(inscriptions.length === 1 ? 1 : currentPage);
+
+  //     toast.dismiss(isLoading);
+  //   }
+  // };
+
   const handleAction = async (id: number, state: string) => {
+    const isLoading = toast.loading("Cambiando estado...");
+
     try {
       const res = await fetch(
         `/api/inscription/action?id=${id}&state=${state}`
@@ -55,11 +83,22 @@ const PendingRejectedPage = () => {
 
       if (!res.ok) {
         throw new Error(
-          data.message || "Error canbiar el estado de la inscripción"
+          data.message || "Error al cambiar el estado de la inscripción"
         );
       }
 
-      toast.success("Cambio de estado realizado exitosamente");
+      toast.success("El estado se actualizó correctamente.", {
+        position: "bottom-right",
+      });
+
+      setInscriptions((currentInscriptions) =>
+        currentInscriptions.filter((inscription) => inscription.id !== id)
+      );
+
+      setMeta((currentMeta) => {
+        if (!currentMeta) return null;
+        return { ...currentMeta, total: currentMeta.total - 1 };
+      });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -67,9 +106,17 @@ const PendingRejectedPage = () => {
         toast.error("Error en la solicitud");
       }
     } finally {
-      fetchInscriptions(inscriptions.length === 1 ? 1 : currentPage);
+      toast.dismiss(isLoading);
     }
   };
+
+  useEffect(() => {
+    if (inscriptions.length === 0 && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    } else if (inscriptions.length === 0 && meta && meta.total > 0) {
+      fetchInscriptions(1);
+    }
+  }, [inscriptions]);
 
   return (
     <div className="">

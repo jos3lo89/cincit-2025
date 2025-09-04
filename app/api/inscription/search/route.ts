@@ -13,6 +13,9 @@ export const GET = async (request: NextRequest) => {
     const inscriptions = await prisma.inscription.findMany({
       where: {
         user: {
+          role: {
+            not: "ADMINISTRATOR",
+          },
           OR: [
             {
               dni: {
@@ -64,6 +67,7 @@ export const GET = async (request: NextRequest) => {
             id: true,
             publicUrl: true,
             imgId: true,
+            numTicket: true,
           },
         },
       },

@@ -3,9 +3,8 @@ import { AttendanceState, AttendanceType, CincitEdition } from "@prisma/client";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 
-// Esquema de validación con Zod para la fecha de entrada
 const createAttendanceSchema = z.object({
-  date: z.string(), // Asegura que la fecha venga en formato ISO 8601
+  date: z.string(),
 });
 
 export async function POST(req: NextRequest) {

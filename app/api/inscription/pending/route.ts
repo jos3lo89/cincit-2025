@@ -11,7 +11,14 @@ export const GET = async (req: NextRequest) => {
 
     const [inscriptions, total] = await prisma.$transaction([
       prisma.inscription.findMany({
-        where: { state: "pending" },
+        where: {
+          state: "pending",
+          user: {
+            role: {
+              not: "ADMINISTRATOR",
+            },
+          },
+        },
         skip: skip,
         take: pageSize,
         orderBy: { createdAt: "asc" },
@@ -32,6 +39,7 @@ export const GET = async (req: NextRequest) => {
               url: true,
               publicUrl: true,
               imgId: true,
+              numTicket: true,
             },
           },
         },

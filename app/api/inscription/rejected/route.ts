@@ -16,6 +16,11 @@ export const GET = async (req: NextRequest) => {
       prisma.inscription.findMany({
         where: {
           state: "rejected",
+          user: {
+            role: {
+              not: "ADMINISTRATOR",
+            },
+          },
         },
         skip,
         take: pageSize,
@@ -37,6 +42,7 @@ export const GET = async (req: NextRequest) => {
               url: true,
               publicUrl: true,
               imgId: true,
+              numTicket: true,
             },
           },
         },

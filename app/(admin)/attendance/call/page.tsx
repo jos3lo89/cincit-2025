@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,21 +14,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  User,
-  Calendar,
-  CheckCircle,
-  CardSim,
-  IdCard,
-  RotateCcw,
-} from "lucide-react";
+import { Calendar, CheckCircle, IdCard, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { searchByDni, searchByDnitype } from "@/schemas/user.schema";
 import { AttendanceI, UserI } from "@/interfaces/user.interface";
-import { formatDate } from "@/utils/time.util";
 import { getbadgeLabel, getBadgeVariant } from "@/utils/attendance.util";
 import LoadingIconButton from "@/components/LoadingIconButton";
 import UserCardAttendance from "@/components/attendance/UserCardAttendance";
+import { formatDatePe } from "@/utils/hours.util";
 
 const AttendanceCallPage = () => {
   const [attendance, setAttendance] = useState<AttendanceI | null>(null);
@@ -179,7 +171,7 @@ const AttendanceCallPage = () => {
                 <div className="flex items-center justify-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span className="text-xs font-medium">
-                    {formatDate(attendanceItem.date, "dash")}
+                    {formatDatePe(attendanceItem.date, "date")}
                   </span>
                 </div>
                 <div className="flex justify-center">
@@ -204,8 +196,8 @@ const AttendanceCallPage = () => {
         <div className="max-w-sm mx-auto text-center space-y-3">
           <div className="rounded-md">
             <p className="text-primary">
-              <span>{formatDate(attendance.date)} </span>-
-              <span> {getbadgeLabel(attendance.attendanceType)}</span>
+              {/* <span>{formatDate(attendance.date)} </span>- */}
+              {/* <span> {getbadgeLabel(attendance.attendanceType)}</span> */}
             </p>
           </div>
           <Button

@@ -31,6 +31,7 @@ import {
   X,
   LayoutGrid,
   List,
+  Eye,
 } from "lucide-react";
 import { ImageModal } from "./ImageModal";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PacmanLoader } from "react-spinners";
 import type { Inscription } from "@/interfaces/inscription.interface";
+import { ImageVoucherModal } from "../ImageVoucherModal";
 
 type InscriptionListProps = {
   inscriptions: Inscription[];
@@ -74,6 +76,17 @@ const InscriptionList = ({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pageSize, setPageSize] = useState(10);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [ticketNumber, setTicketNumber] = useState<string | null>(null);
+
+  const openImageModal = (imageUrl: string, numTicket: string) => {
+    setSelectedImage(imageUrl);
+    setTicketNumber(numTicket);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
 
   const debouncedSetGlobalFilter = useMemo(
     () => debounce((value: string) => setGlobalFilter(value), 300),
@@ -194,14 +207,31 @@ const InscriptionList = ({
     {
       id: "voucher",
       header: "Voucher",
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ImageModal
-            imagePath={row.original.voucher.publicUrl}
-            altText={`Voucher de pago - Inscripción #${row.original.id}`}
-          />
-        </div>
-      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                openImageModal(
+                  row.original.voucher.publicUrl,
+                  row.original.voucher.numTicket
+                )
+              }
+            >
+              <Eye className="h-4 w-4" />
+              <span className="sr-only">Ver imagen completa</span>
+            </Button>
+
+            <ImageVoucherModal
+              ticketNumber={ticketNumber}
+              imageUrl={selectedImage}
+              onClose={closeImageModal}
+            />
+          </div>
+        );
+      },
     },
   ];
 
@@ -501,9 +531,28 @@ const InscriptionList = ({
                       <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
                         Voucher de Pago
                       </h4>
-                      <ImageModal
+                      {/* <ImageModal
                         imagePath={inscription.voucher.publicUrl}
                         altText={`Voucher de pago - Inscripción #${inscription.id}`}
+                      /> */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          openImageModal(
+                            row.original.voucher.publicUrl,
+                            row.original.voucher.numTicket
+                          )
+                        }
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">Ver imagen completa</span>
+                      </Button>
+
+                      <ImageVoucherModal
+                        ticketNumber={ticketNumber}
+                        imageUrl={selectedImage}
+                        onClose={closeImageModal}
                       />
                     </div>
 
