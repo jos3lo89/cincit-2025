@@ -12,15 +12,11 @@ export const GET = async (req: NextRequest) => {
 
     const skip = (page - 1) * pageSize;
 
-    // Corrección: el count debe ser para "approved" no "pending"
     const [inscriptions, total] = await prisma.$transaction([
       prisma.inscription.findMany({
         skip,
         take: pageSize,
-        orderBy: [
-          { updatedAt: "desc" }, // Primero los más recientes
-          { createdAt: "desc" }, // Segundo criterio de ordenamiento
-        ],
+        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
         include: {
           user: {
             select: {
@@ -38,6 +34,14 @@ export const GET = async (req: NextRequest) => {
               url: true,
               publicUrl: true,
               imgId: true,
+              numTicket: true,
+            },
+          },
+        },
+        where: {
+          user: {
+            role: {
+              not: "ADMINISTRATOR",
             },
           },
         },
@@ -45,7 +49,6 @@ export const GET = async (req: NextRequest) => {
       prisma.inscription.count(),
     ]);
 
-    // Validación adicional de los datos
     if (!inscriptions) {
       return NextResponse.json(
         { message: "No se encontraron inscripciones." },

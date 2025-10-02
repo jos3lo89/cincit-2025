@@ -44,6 +44,7 @@ type InscriptionWithUser = {
     id: string;
     publicUrl: string;
     imgId: string;
+    numTicket: string;
   };
 };
 
@@ -51,6 +52,7 @@ const SearchInscriptionPage = () => {
   const [results, setResults] = useState<InscriptionWithUser[]>([]);
   // El único estado necesario para el modal es saber qué imagen mostrar
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [ticketNumber, setTicketNumber] = useState<string | null>(null);
 
   // 2. ELIMINAMOS los estados 'imageLoading' y 'modalImageLoading' que ya no son necesarios aquí
 
@@ -106,8 +108,9 @@ const SearchInscriptionPage = () => {
   };
 
   // 3. SIMPLIFICAMOS las funciones para abrir y cerrar el modal
-  const openImageModal = (imageUrl: string) => {
+  const openImageModal = (imageUrl: string, numTicket: string) => {
     setSelectedImage(imageUrl);
+    setTicketNumber(numTicket);
   };
 
   const closeImageModal = () => {
@@ -218,7 +221,10 @@ const SearchInscriptionPage = () => {
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        openImageModal(inscription.voucher.publicUrl)
+                        openImageModal(
+                          inscription.voucher.publicUrl,
+                          inscription.voucher.numTicket
+                        )
                       }
                     >
                       <Eye className="h-4 w-4" />
@@ -246,7 +252,11 @@ const SearchInscriptionPage = () => {
         </div>
       )}
 
-      <ImageVoucherModal imageUrl={selectedImage} onClose={closeImageModal} />
+      <ImageVoucherModal
+        ticketNumber={ticketNumber}
+        imageUrl={selectedImage}
+        onClose={closeImageModal}
+      />
     </div>
   );
 };

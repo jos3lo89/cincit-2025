@@ -1,7 +1,7 @@
 import { JwtRegisterDecoded } from "@/interfaces/jwt.interface";
 import { verifyToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
-import { supabase } from "@/lib/supabase";
+// import { supabase } from "@/lib/supabase";
 import { createUserSchema } from "@/schemas/register.schema";
 import { NextRequest, NextResponse } from "next/server";
 import { flattenError, ZodError } from "zod";
@@ -26,6 +26,9 @@ export const POST = async (req: NextRequest) => {
 
     const formData = await req.formData();
     const body = Object.fromEntries(formData.entries());
+
+    console.log("cuerpo", body);
+
     const validatedData = createUserSchema.parse(body);
 
     if (
@@ -52,27 +55,54 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    const fileName = `${validatedData.dni}-${Date.now()}`;
-    const bucketName = process.env.SUPABASE_BUCKET_NAME;
+    // START
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from(bucketName)
-      .upload(fileName, validatedData.voucher, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+    // const fileName = `${validatedData.dni}-${Date.now()}`;
 
-    if (uploadError) {
-      console.error("Error al subir archivo a Supabase:", uploadError);
+    const imageFormData = new FormData();
+    imageFormData.append("image", validatedData.voucher);
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_IMG_SERVICE}/api/v1/upload`,
+      { method: "POST", body: imageFormData }
+    );
+
+    if (!response.ok) {
       return NextResponse.json(
-        { message: "Error al procesar el archivo del voucher." },
-        { status: 500 }
+        { message: "Error al subir la imagen." },
+        { status: 400 }
       );
     }
+    const voucher = await response.json();
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from(bucketName).getPublicUrl(uploadData.path);
+    // voucher: {
+    //     id: voucherData.id,
+    //     url: voucherData.url,
+    //     urlFull: voucherData.urlFull,
+    //   },
+
+    // const bucketName = process.env.SUPABASE_BUCKET_NAME;
+
+    // const { data: uploadData, error: uploadError } = await supabase.storage
+    //   .from(bucketName)
+    //   .upload(fileName, validatedData.voucher, {
+    //     cacheControl: "3600",
+    //     upsert: false,
+    //   });
+
+    // if (uploadError) {
+    //   console.error("Error al subir archivo a Supabase:", uploadError);
+    //   return NextResponse.json(
+    //     { message: "Error al procesar el archivo del voucher." },
+    //     { status: 500 }
+    //   );
+    // }
+
+    // const {
+    //   data: { publicUrl },
+    // } = supabase.storage.from(bucketName).getPublicUrl(uploadData.path);
+
+    // FIN
 
     await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
@@ -88,10 +118,11 @@ export const POST = async (req: NextRequest) => {
 
       const newVoucher = await tx.voucher.create({
         data: {
-          url: uploadData.fullPath,
-          publicUrl: publicUrl,
-          imgId: uploadData.id,
+          url: voucher.url,
+          publicUrl: voucher.urlFull,
+          imgId: voucher.id,
           userId: newUser.id,
+          numTicket: validatedData.numTicket,
         },
       });
 
@@ -112,6 +143,8 @@ export const POST = async (req: NextRequest) => {
     );
   } catch (error) {
     if (error instanceof ZodError) {
+      console.log(flattenError(error).fieldErrors);
+
       return NextResponse.json(
         {
           message: "Datos inválidos, por favor verifique el formulario.",

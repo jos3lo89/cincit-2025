@@ -4,9 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -60,6 +60,7 @@ model UserAttendance {
 model Voucher {
   id           String        @id @default(uuid())
   userId       String
+  numTicket    String?       @unique
   publicUrl    String?
   url          String?
   imgId        String?

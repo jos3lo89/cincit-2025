@@ -25,6 +25,7 @@ export interface Voucher {
   url: string;
   publicUrl: string;
   imgId: string;
+  numTicket: string;
 }
 
 export interface Meta {

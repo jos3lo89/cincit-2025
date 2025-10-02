@@ -14,12 +14,14 @@ import {
 import { Button } from "./ui/button";
 
 type ImageVoucherModalProps = {
+  ticketNumber: string | null;
   imageUrl: string | null;
   onClose: () => void;
   title?: string;
 };
 
 export const ImageVoucherModal = ({
+  ticketNumber,
   imageUrl,
   onClose,
   title = "Imagen del Voucher",
@@ -43,7 +45,10 @@ export const ImageVoucherModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription></DialogDescription>
+          <DialogDescription>
+            numero de tikcet:
+            <span className="text-primary"> {ticketNumber}</span>
+          </DialogDescription>
         </DialogHeader>
         <div className="relative flex items-center justify-center min-h-[200px]">
           {isLoading && (

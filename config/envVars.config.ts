@@ -1,7 +1,7 @@
 import { string, object, infer } from "zod";
 const envVars = object({
   DATABASE_URL: string(),
-  DIRECT_URL: string(),
+  // DIRECT_URL: string(),
   AUTH_SECRET: string(),
   EMAIL_USER: string(),
   EMAIL_PASS: string(),

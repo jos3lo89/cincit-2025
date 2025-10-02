@@ -31,6 +31,7 @@ import {
   X,
   LayoutGrid,
   List,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PacmanLoader } from "react-spinners";
 import { ImageModal } from "./ImageModal";
 import { Inscription } from "@/interfaces/inscription.interface";
+import { toast } from "sonner";
+import { ImageVoucherModal } from "../ImageVoucherModal";
 
 type InscriptionListProps = {
   inscriptions: Inscription[];
@@ -74,15 +77,8 @@ const InscriptionTableList = ({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pageSize, setPageSize] = useState(10);
   const [globalFilter, setGlobalFilter] = useState("");
-
-  const debouncedSetGlobalFilter = useMemo(
-    () => debounce((value: string) => setGlobalFilter(value), 300),
-    []
-  );
-
-  // useEffect(() => {
-  //   debouncedSetGlobalFilter(searchQuery);
-  // }, [searchQuery, debouncedSetGlobalFilter]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [ticketNumber, setTicketNumber] = useState<string | null>(null);
 
   const onAction = async (id: number, state: "approved" | "rejected") => {
     if (state === "approved") {
@@ -93,6 +89,15 @@ const InscriptionTableList = ({
 
     await handleAction(id, state);
     setLoadingActions({ approving: null, rejecting: null });
+  };
+
+  const openImageModal = (imageUrl: string, numTicket: string) => {
+    setSelectedImage(imageUrl);
+    setTicketNumber(numTicket);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
   };
 
   const columns: ColumnDef<Inscription>[] = [
@@ -194,14 +199,31 @@ const InscriptionTableList = ({
     {
       id: "voucher",
       header: "Voucher",
-      cell: ({ row }) => (
-        <div className="text-center">
-          <ImageModal
-            imagePath={row.original.voucher.publicUrl}
-            altText={`Voucher de pago - Inscripción #${row.original.id}`}
-          />
-        </div>
-      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                openImageModal(
+                  row.original.voucher.publicUrl,
+                  row.original.voucher.numTicket
+                )
+              }
+            >
+              <Eye className="h-4 w-4" />
+              <span className="sr-only">Ver imagen completa</span>
+            </Button>
+
+            <ImageVoucherModal
+              ticketNumber={ticketNumber}
+              imageUrl={selectedImage}
+              onClose={closeImageModal}
+            />
+          </div>
+        );
+      },
     },
     {
       id: "actions",
@@ -217,11 +239,7 @@ const InscriptionTableList = ({
                 disabled={loadingActions.rejecting === row.original.id}
                 className="flex items-center gap-1 whitespace-nowrap"
               >
-                {loadingActions.rejecting === row.original.id ? (
-                  <PacmanLoader size={10} color="#ffffff" />
-                ) : (
-                  <XCircle className="h-3 w-3" />
-                )}
+                <XCircle className="h-3 w-3" />
                 <span className="hidden lg:inline">Rechazar</span>
               </Button>
             ) : row.original.state === "pending" ? (
@@ -233,11 +251,7 @@ const InscriptionTableList = ({
                   disabled={loadingActions.approving === row.original.id}
                   className="flex items-center gap-1 whitespace-nowrap"
                 >
-                  {loadingActions.approving === row.original.id ? (
-                    <PacmanLoader size={10} color="#ffffff" />
-                  ) : (
-                    <CheckCircle className="h-3 w-3" />
-                  )}
+                  <CheckCircle className="h-3 w-3" />
                   <span className="hidden lg:inline">Aprobar</span>
                 </Button>
 
@@ -248,11 +262,7 @@ const InscriptionTableList = ({
                   disabled={loadingActions.rejecting === row.original.id}
                   className="flex items-center gap-1 whitespace-nowrap"
                 >
-                  {loadingActions.rejecting === row.original.id ? (
-                    <PacmanLoader size={10} color="#ffffff" />
-                  ) : (
-                    <XCircle className="h-3 w-3" />
-                  )}
+                  <XCircle className="h-3 w-3" />
                   <span className="hidden lg:inline">Rechazar</span>
                 </Button>
               </>
@@ -264,11 +274,7 @@ const InscriptionTableList = ({
                 disabled={loadingActions.approving === row.original.id}
                 className="flex items-center gap-1 whitespace-nowrap"
               >
-                {loadingActions.approving === row.original.id ? (
-                  <PacmanLoader size={10} color="#ffffff" />
-                ) : (
-                  <CheckCircle className="h-3 w-3" />
-                )}
+                <CheckCircle className="h-3 w-3" />
                 <span className="hidden lg:inline">Aprobar</span>
               </Button>
             )}
@@ -334,28 +340,6 @@ const InscriptionTableList = ({
     <div className="w-full p-4 space-y-6">
       {/* Search and View Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* <div className="relative flex-1 max-w-md w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <label htmlFor="search" className="sr-only"></label>
-          <Input
-            id="search"
-            type="text"
-            placeholder="Buscar por ID, nombre, email, institución o tipo..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2"
-              onClick={() => setSearchQuery("")}
-            >
-              <X className="h-4 w-4 text-muted-foreground" />
-            </Button>
-          )}
-        </div> */}
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
             <Button
@@ -468,7 +452,6 @@ const InscriptionTableList = ({
           </div> */}
         </div>
       ) : (
-        /* Card View - Mobile Optimized */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
           {table.getFilteredRowModel().rows.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground col-span-full">
@@ -482,10 +465,10 @@ const InscriptionTableList = ({
                   key={inscription.id}
                   className="w-full shadow-sm hover:shadow-md transition-shadow duration-300"
                 >
-                  <CardHeader className="pb-3">
+                  <CardHeader>
                     <div className="flex items-center justify-between gap-3">
                       <CardTitle className="text-lg font-bold">
-                        Inscripción #{inscription.id}
+                        Inscripción
                       </CardTitle>
                       <Badge
                         variant={
@@ -510,7 +493,6 @@ const InscriptionTableList = ({
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-4">
-                    {/* User Information */}
                     <div className="space-y-3">
                       <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
                         Información del Usuario
@@ -544,7 +526,6 @@ const InscriptionTableList = ({
                       </div>
                     </div>
 
-                    {/* Inscription Details */}
                     <div className="space-y-3">
                       <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
                         Detalles de Inscripción
@@ -572,18 +553,36 @@ const InscriptionTableList = ({
                       </div>
                     </div>
 
-                    {/* Voucher */}
                     <div className="space-y-3">
                       <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
                         Voucher de Pago
                       </h4>
-                      <ImageModal
+                      {/* <ImageModal
                         imagePath={inscription.voucher.publicUrl}
                         altText={`Voucher de pago - Inscripción #${inscription.id}`}
+                      /> */}
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          openImageModal(
+                            row.original.voucher.publicUrl,
+                            row.original.voucher.numTicket
+                          )
+                        }
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">Ver imagen completa</span>
+                      </Button>
+
+                      <ImageVoucherModal
+                        ticketNumber={ticketNumber}
+                        imageUrl={selectedImage}
+                        onClose={closeImageModal}
                       />
                     </div>
 
-                    {/* Actions */}
                     {inscription.state === "pending" ? (
                       <div className="flex justify-end gap-2 pt-3 border-t">
                         <Button
@@ -593,14 +592,8 @@ const InscriptionTableList = ({
                           disabled={loadingActions.approving === inscription.id}
                           className="flex items-center gap-2"
                         >
-                          {loadingActions.approving === inscription.id ? (
-                            <PacmanLoader size={12} color="#ffffff" />
-                          ) : (
-                            <>
-                              <CheckCircle className="h-4 w-4" />
-                              Aprobar
-                            </>
-                          )}
+                          <CheckCircle className="h-4 w-4" />
+                          Aprobar
                         </Button>
                         <Button
                           variant="destructive"
@@ -609,14 +602,8 @@ const InscriptionTableList = ({
                           disabled={loadingActions.rejecting === inscription.id}
                           className="flex items-center gap-2"
                         >
-                          {loadingActions.rejecting === inscription.id ? (
-                            <PacmanLoader size={12} color="#ffffff" />
-                          ) : (
-                            <>
-                              <XCircle className="h-4 w-4" />
-                              Rechazar
-                            </>
-                          )}
+                          <XCircle className="h-4 w-4" />
+                          Rechazar
                         </Button>
                       </div>
                     ) : inscription.state === "approved" ? (
@@ -628,14 +615,8 @@ const InscriptionTableList = ({
                           disabled={loadingActions.rejecting === inscription.id}
                           className="flex items-center gap-2"
                         >
-                          {loadingActions.rejecting === inscription.id ? (
-                            <PacmanLoader size={12} color="#ffffff" />
-                          ) : (
-                            <>
-                              <XCircle className="h-4 w-4" />
-                              Rechazar
-                            </>
-                          )}
+                          <XCircle className="h-4 w-4" />
+                          Rechazar
                         </Button>
                       </div>
                     ) : (
@@ -647,14 +628,8 @@ const InscriptionTableList = ({
                           disabled={loadingActions.approving === inscription.id}
                           className="flex items-center gap-2"
                         >
-                          {loadingActions.approving === inscription.id ? (
-                            <PacmanLoader size={12} color="#ffffff" />
-                          ) : (
-                            <>
-                              <CheckCircle className="h-4 w-4" />
-                              Aprobar
-                            </>
-                          )}
+                          <CheckCircle className="h-4 w-4" />
+                          Aprobar
                         </Button>
                       </div>
                     )}

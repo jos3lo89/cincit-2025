@@ -64,8 +64,6 @@ const CreateAttendancePage = () => {
     try {
       const response = await fetch("/api/attendance/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // Enviamos la fecha en formato ISO para que el backend la entienda
         body: JSON.stringify({ date: values.attendanceDate.toISOString() }),
       });
 

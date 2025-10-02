@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: lain
+      POSTGRES_PASSWORD: 3322
+      POSTGRES_DB: cincit
+    ports:
+      - "8000:5432"
+    volumes:
+      - db_data_cincit:/var/lib/postgresql/data
+
+volumes:
+  db_data_cincit:

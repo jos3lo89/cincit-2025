@@ -55,6 +55,8 @@ const roleColors = {
   STAFF: "default",
 } as const;
 
+type NonAdminRoles = Exclude<Role, "ADMINISTRATOR">;
+
 const ChangeRolePage = () => {
   const [user, setUser] = useState<UserInterfaceI | null>(null);
   const [searchAttempted, setSearchAttempted] = useState(false);
@@ -243,11 +245,13 @@ const ChangeRolePage = () => {
                     <SelectValue placeholder="Selecciona un rol" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(Role).map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {roleLabels[role]}
-                      </SelectItem>
-                    ))}
+                    {Object.values(Role)
+                      .filter((role) => role !== "ADMINISTRATOR")
+                      .map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {roleLabels[role]}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
