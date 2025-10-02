@@ -10,7 +10,7 @@
     "format": "biome format --write"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",
