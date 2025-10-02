@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 4000",
-    "build": "next build --turbopack",
-    "start": "next start -p 4000",
+    "build": "npx prisma generate && next build --turbopack",
+    "start": "npx prisma migrate deploy && npx prisma db seed && next start -p 4000",
     "lint": "biome check",
-    "format": "biome format --write",
-    "postinstall": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed"
+    "format": "biome format --write"
   },
   "prisma": {
     "seed": "node prisma/seed.ts"
