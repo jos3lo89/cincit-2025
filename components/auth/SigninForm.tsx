@@ -39,7 +39,7 @@ const SigninForm = () => {
       if (res.error) {
         setError(res.error);
       } else {
-        toast.success("Vienvenido");
+        toast.success("Bienvenido");
         signupForm.reset();
         router.push("/");
       }
