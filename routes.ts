@@ -23,7 +23,15 @@ export const protectedRoutesByRole: Record<string, string[]> = {
     "/report",
     "/user/change-role",
   ],
-  INSCRIBER: ["/", "/signup", "/attendance/call"],
+  INSCRIBER: [
+    "/",
+    "/signup",
+    "/attendance/call",
+    "/inscription/all",
+    "/inscription/pending",
+    "/inscription/approved",
+    "/inscription/rejected",
+  ],
   PARTICIPANT: [],
   STAFF: [],
 };

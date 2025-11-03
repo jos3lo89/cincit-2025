@@ -18,6 +18,7 @@ export interface User {
   email: string;
   dni: string;
   institution: string;
+  telephone: string;
 }
 
 export interface Voucher {

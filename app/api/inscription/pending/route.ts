@@ -31,6 +31,7 @@ export const GET = async (req: NextRequest) => {
               email: true,
               dni: true,
               institution: true,
+              telephone: true,
             },
           },
           voucher: {

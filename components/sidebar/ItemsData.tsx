@@ -124,7 +124,7 @@ export const sideBarData = {
           },
           {
             title: "Aprovados",
-            url: "/inscriptions/approved",
+            url: "/inscription/approved",
           },
           {
             title: "Rechazados",
