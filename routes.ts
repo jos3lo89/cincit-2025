@@ -31,6 +31,7 @@ export const protectedRoutesByRole: Record<string, string[]> = {
     "/inscription/pending",
     "/inscription/approved",
     "/inscription/rejected",
+    "/report",
   ],
   PARTICIPANT: [],
   STAFF: [],
