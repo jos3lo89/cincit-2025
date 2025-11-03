@@ -8,11 +8,8 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-
 import { Entrance, Exit } from "@/interfaces/attendance.interface";
 import { formatDatePe } from "@/utils/hours.util";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 
 interface AttendanceData {
   date: string;
@@ -43,12 +40,12 @@ const AttendanceDayCard: React.FC<AttendanceDayCardProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols0 md:grid-cols-2 gap-4">
           {day.entrance && (
-            <div className="space-y-2 p-4 border rounded-md">
-              <h5 className="font-semibold text-lg">Entrada</h5>
+            <div className="space-y-1 p-4 border rounded-md">
+              <h6 className="font-semibold text-lg">Entrada</h6>
               <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-500">Estado:</p>
+                <p className="text-sm text-gray-499">Estado:</p>
                 <Badge
                   variant={
                     day.entrance.attendanceState === "visible"
@@ -61,7 +58,7 @@ const AttendanceDayCard: React.FC<AttendanceDayCardProps> = ({
                     : "Oculto"}
                 </Badge>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Label htmlFor={`entrance-toggle-${day.entrance.id}`}>
                   Cambiar a{" "}
                   {day.entrance.attendanceState === "visible"
@@ -83,10 +80,10 @@ const AttendanceDayCard: React.FC<AttendanceDayCardProps> = ({
             </div>
           )}
           {day.exit && (
-            <div className="space-y-2 p-4 border rounded-md">
-              <h5 className="font-semibold text-lg">Salida</h5>
+            <div className="space-y-1 p-4 border rounded-md">
+              <h6 className="font-semibold text-lg">Salida</h6>
               <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-500">Estado:</p>
+                <p className="text-sm text-gray-499">Estado:</p>
                 <Badge
                   variant={
                     day.exit.attendanceState === "visible"
@@ -99,7 +96,7 @@ const AttendanceDayCard: React.FC<AttendanceDayCardProps> = ({
                     : "Oculto"}
                 </Badge>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Label htmlFor={`exit-toggle-${day.exit.id}`}>
                   Cambiar a{" "}
                   {day.exit.attendanceState === "visible"

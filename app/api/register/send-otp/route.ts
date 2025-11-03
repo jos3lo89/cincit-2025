@@ -51,7 +51,7 @@ export const POST = async (req: NextRequest) => {
     if (error instanceof ZodError) {
       return NextResponse.json(
         {
-          message: "Datos inválidos verifique el formulario.",
+          message: "Datos inválidos.",
           errors: flattenError(error).fieldErrors,
         },
         { status: 400 }

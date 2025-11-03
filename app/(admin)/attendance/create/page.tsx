@@ -1,15 +1,12 @@
-// src/app/admin/attendance/create/page.tsx
 "use client";
 
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -23,7 +20,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,15 +30,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils"; // Asegúrate de tener este helper de shadcn
+import { cn } from "@/lib/utils";
 
-// 1. Definir el esquema de validación del formulario con Zod
 const formSchema = z.object({
   attendanceDate: z.date("Por favor, selecciona una fecha."),
 });
 
 const CreateAttendancePage = () => {
-  // 2. Configurar react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -53,7 +47,6 @@ const CreateAttendancePage = () => {
     formState: { isSubmitting },
   } = form;
 
-  // 3. Función para manejar el envío del formulario
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const loadingToast = toast.loading("Creando registros de asistencia...");
 
@@ -70,7 +63,6 @@ const CreateAttendancePage = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // Si la respuesta no es exitosa, lanzamos un error con el mensaje de la API
         throw new Error(data.message || "Error al crear la asistencia.");
       }
 
@@ -83,7 +75,7 @@ const CreateAttendancePage = () => {
         )}.`,
       });
 
-      form.reset(); // Limpiamos el formulario después del éxito
+      form.reset();
     } catch (error: any) {
       console.error(error);
       toast.error("Ocurrió un error", {
