@@ -132,6 +132,18 @@ export const sideBarData = {
           },
         ],
       },
+
+      {
+        title: "Reportes",
+        url: "#",
+        icon: NotebookTabs,
+        items: [
+          {
+            title: "Reporticitos",
+            url: "/report",
+          },
+        ],
+      },
     ],
 
     PARTICIPANT: [
