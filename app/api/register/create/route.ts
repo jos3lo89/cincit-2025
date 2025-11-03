@@ -27,8 +27,6 @@ export const POST = async (req: NextRequest) => {
     const formData = await req.formData();
     const body = Object.fromEntries(formData.entries());
 
-    console.log("cuerpo", body);
-
     const validatedData = createUserSchema.parse(body);
 
     if (
@@ -74,6 +72,7 @@ export const POST = async (req: NextRequest) => {
 
     const imageFormData = new FormData();
     imageFormData.append("image", validatedData.voucher);
+    imageFormData.append("dni", validatedData.dni);
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_URL_IMG_SERVICE}/api/v1/upload`,
