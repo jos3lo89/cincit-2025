@@ -9,14 +9,14 @@ export const formatDatePe = (
   if (mode === "date") {
     return new Intl.DateTimeFormat("es-PE", {
       dateStyle: "short",
-      timeZone: "America/Lima",
+      timeZone: "UTC",
     }).format(d);
   }
 
   if (mode === "time") {
     return new Intl.DateTimeFormat("es-PE", {
       timeStyle: "medium",
-      timeZone: "America/Lima",
+      timeZone: "UTC",
     }).format(d);
   }
 
@@ -24,6 +24,6 @@ export const formatDatePe = (
   return new Intl.DateTimeFormat("es-PE", {
     dateStyle: "short",
     timeStyle: "medium",
-    timeZone: "America/Lima",
+    timeZone: "UTC",
   }).format(d);
 };

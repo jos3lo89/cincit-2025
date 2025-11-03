@@ -55,6 +55,19 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
+    // num ticket unique
+
+    const isNumTicketUnique = await prisma.voucher.findUnique({
+      where: { numTicket: validatedData.numTicket },
+    });
+
+    if (isNumTicketUnique) {
+      return NextResponse.json(
+        { message: "Este número de ticket ya se encuentra registrado." },
+        { status: 409 }
+      );
+    }
+
     // START
 
     // const fileName = `${validatedData.dni}-${Date.now()}`;

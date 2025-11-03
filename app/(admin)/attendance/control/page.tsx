@@ -1,7 +1,6 @@
 "use client";
 
 import AttendanceDayCard from "@/components/attendance/AttendanceDayCard";
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { AttendanceI } from "@/interfaces/attendance.interface";
 import { useEffect, useState } from "react";
