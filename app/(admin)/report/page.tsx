@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-// 1. Importamos tu Server Action
 import { getApprovedInscriptionsReport } from "@/actions/reports";
 import {
   ApprovedUserData,
@@ -72,8 +71,7 @@ const ReportPage = () => {
             <div className="flex-1">
               <h3 className="font-semibold">Reporte de Inscritos Aprobados</h3>
               <p className="text-sm text-muted-foreground">
-                Exporta la lista completa de participantes aprobados. Incluye
-                DNI, Nombres, Apellidos, Email y Teléfono. S
+                Exporta la lista completa de participantes aprobados.
               </p>
             </div>
             <Button
