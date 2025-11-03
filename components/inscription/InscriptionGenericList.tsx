@@ -32,6 +32,8 @@ import {
   LayoutGrid,
   List,
   Eye,
+  PhoneCall,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -138,12 +140,12 @@ const InscriptionTableList = ({
       ),
     },
     {
-      accessorKey: "user.institution",
+      accessorKey: "user.telephone",
       header: "Institución",
       cell: ({ row }) => (
         <div className="flex items-center gap-2 min-w-[180px]">
           <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis block min-w-0 flex-1">
-            {row.original.user.institution}
+            {row.original.user.telephone}
           </span>
         </div>
       ),
@@ -506,9 +508,9 @@ const InscriptionTableList = ({
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <span className="text-muted-foreground text-xs overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1">
-                            {inscription.user.email}
+                            {inscription.user.telephone}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
