@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -25,30 +25,38 @@ import {
   Building,
   CheckCircle,
   CreditCard,
-  Mail,
   XCircle,
-  Search,
-  X,
   LayoutGrid,
   List,
   Eye,
-  PhoneCall,
   Phone,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PacmanLoader } from "react-spinners";
-import { ImageModal } from "./ImageModal";
 import { Inscription } from "@/interfaces/inscription.interface";
 import { toast } from "sonner";
 import { ImageVoucherModal } from "../ImageVoucherModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type InscriptionListProps = {
   inscriptions: Inscription[];
   handleAction: (id: number, state: string) => Promise<void>;
   loading: boolean;
+  onUserDeleted: (dni: string) => void;
 };
 
 interface LoadingActions {
@@ -56,18 +64,19 @@ interface LoadingActions {
   rejecting: number | null;
 }
 
-const debounce = (func: (...args: any[]) => void, delay: number) => {
-  let timeoutId: NodeJS.Timeout;
-  return (...args: any[]) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func(...args), delay);
-  };
-};
+// const debounce = (func: (...args: any[]) => void, delay: number) => {
+//   let timeoutId: NodeJS.Timeout;
+//   return (...args: any[]) => {
+//     clearTimeout(timeoutId);
+//     timeoutId = setTimeout(() => func(...args), delay);
+//   };
+// };
 
 const InscriptionTableList = ({
   inscriptions,
   handleAction,
   loading,
+  onUserDeleted,
 }: InscriptionListProps) => {
   const [loadingActions, setLoadingActions] = useState<LoadingActions>({
     approving: null,
@@ -81,6 +90,7 @@ const InscriptionTableList = ({
   const [globalFilter, setGlobalFilter] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [ticketNumber, setTicketNumber] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null); // Almacena el DNI
 
   const onAction = async (id: number, state: "approved" | "rejected") => {
     if (state === "approved") {
@@ -100,6 +110,28 @@ const InscriptionTableList = ({
 
   const closeImageModal = () => {
     setSelectedImage(null);
+  };
+
+  const handleDeleteUser = async (dni: string) => {
+    setIsDeleting(dni);
+    try {
+      const res = await fetch(`/api/user/${dni}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Error al eliminar el usuario");
+      }
+      toast.success("El usuario se eliminó correctamente");
+      onUserDeleted(dni);
+    } catch (error) {
+      toast.error("Error al eliminar el usuario");
+      console.log("Error:", error);
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   const columns: ColumnDef<Inscription>[] = [
@@ -269,16 +301,63 @@ const InscriptionTableList = ({
                 </Button>
               </>
             ) : (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => onAction(row.original.id, "approved")}
-                disabled={loadingActions.approving === row.original.id}
-                className="flex items-center gap-1 whitespace-nowrap"
-              >
-                <CheckCircle className="h-3 w-3" />
-                <span className="hidden lg:inline">Aprobar</span>
-              </Button>
+              <>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => onAction(row.original.id, "approved")}
+                  disabled={loadingActions.approving === row.original.id}
+                  className="flex items-center gap-1 whitespace-nowrap"
+                >
+                  <CheckCircle className="h-3 w-3" />
+                  <span className="hidden lg:inline">Aprobar</span>
+                </Button>
+                {/* <Button
+                  className="cursor-pointer"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDeleteUser(row.original.user.dni)}
+                >
+                  <Trash2 />
+                </Button> */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      className="cursor-pointer w-[36px]"
+                      variant="destructive"
+                      size="sm"
+                      disabled={isDeleting === row.original.user.dni}
+                    >
+                      {isDeleting === row.original.user.dni ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        ¿Estás realmente seguro?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta acción es irreversible. El usuario con DNI{" "}
+                        {row.original.user.dni} y todos sus datos
+                        (inscripciones, vouchers) se eliminarán por completo.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteUser(row.original.user.dni)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Aceptar y Eliminar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
             )}
           </div>
         </div>
@@ -633,6 +712,46 @@ const InscriptionTableList = ({
                           <CheckCircle className="h-4 w-4" />
                           Aprobar
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              className="cursor-pointer w-[36px]"
+                              variant="destructive"
+                              size="sm"
+                              disabled={isDeleting === inscription.user.dni}
+                            >
+                              {isDeleting === inscription.user.dni ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                ¿Estás realmente seguro?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta acción es irreversible. El usuario con DNI{" "}
+                                {inscription.user.dni} y todos sus datos
+                                (inscripciones, vouchers) se eliminarán por
+                                completo.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() =>
+                                  handleDeleteUser(inscription.user.dni)
+                                }
+                                className="bg-destructive hover:bg-destructive/90"
+                              >
+                                Aceptar y Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     )}
                   </CardContent>

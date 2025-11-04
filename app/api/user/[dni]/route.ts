@@ -1,4 +1,3 @@
-import AttendanceCallPage from "@/app/(admin)/attendance/call/page";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -58,3 +57,79 @@ export async function GET(
     );
   }
 }
+
+export const DELETE = async (
+  _: NextRequest,
+  { params }: { params: Promise<{ dni: string }> }
+) => {
+  try {
+    const { dni } = await params;
+
+    const user = await prisma.user.findFirst({
+      where: { dni, inscriptions: { some: { state: "rejected" } } },
+      include: {
+        vouchers: {
+          select: {
+            imgId: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "No se encontró el usuario." },
+        { status: 404 }
+      );
+    }
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_IMG_SERVICE}/api/v1/image/${user.vouchers[0].imgId}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { message: "No se pudo eliminar la imagen." },
+        { status: 500 }
+      );
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.inscription.deleteMany({
+        where: { userId: user.id },
+      });
+
+      await tx.userAttendance.deleteMany({
+        where: { userId: user.id },
+      });
+
+      await tx.voucher.deleteMany({
+        where: { userId: user.id },
+      });
+
+      await tx.verificationToken.deleteMany({
+        where: { email: user.email },
+      });
+
+      const deletedUser = await tx.user.delete({
+        where: { id: user.id },
+      });
+
+      return deletedUser;
+    });
+
+    return NextResponse.json(
+      { messsage: "Usuario eliminado correctamente" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log("error: /api/user/:dni", error);
+    return NextResponse.json(
+      { message: "No se pudo eliminar el usuario." },
+      { status: 500 }
+    );
+  }
+};
