@@ -73,7 +73,7 @@ export const sideBarData = {
         icon: NotebookTabs,
         items: [
           {
-            title: "Reporticitos",
+            title: "Reportecitos",
             url: "/report",
           },
         ],
@@ -107,6 +107,14 @@ export const sideBarData = {
             title: "Llamar lista",
             url: "/attendance/call",
           },
+          {
+            title: "Control de asistencia",
+            url: "/attendance/control",
+          },
+          {
+            title: "Crear asistencia",
+            url: "/attendance/create",
+          },
         ],
       },
       {
@@ -139,7 +147,7 @@ export const sideBarData = {
         icon: NotebookTabs,
         items: [
           {
-            title: "Reporticitos",
+            title: "Reportecitos",
             url: "/report",
           },
         ],

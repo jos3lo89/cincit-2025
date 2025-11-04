@@ -110,6 +110,12 @@ const PendingRejectedPage = () => {
     }
   };
 
+  const handleUserDeleted = (dni: string) => {
+    setInscriptions((prevInscriptions) =>
+      prevInscriptions.filter((inscription) => inscription.user.dni !== dni)
+    );
+  };
+
   useEffect(() => {
     if (inscriptions.length === 0 && currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -137,6 +143,7 @@ const PendingRejectedPage = () => {
           inscriptions={inscriptions}
           handleAction={handleAction}
           loading={loading}
+          onUserDeleted={handleUserDeleted}
         />
       </div>
 

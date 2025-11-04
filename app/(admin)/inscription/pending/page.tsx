@@ -109,6 +109,11 @@ const PendingInscriptionsPage = () => {
       toast.dismiss(isLoading);
     }
   };
+  const handleUserDeleted = (dni: string) => {
+    setInscriptions((prevInscriptions) =>
+      prevInscriptions.filter((inscription) => inscription.user.dni !== dni)
+    );
+  };
 
   useEffect(() => {
     if (inscriptions.length === 0 && currentPage > 1) {
@@ -139,6 +144,7 @@ const PendingInscriptionsPage = () => {
           inscriptions={inscriptions}
           handleAction={handleAction}
           loading={loading}
+          onUserDeleted={handleUserDeleted}
         />
       </div>
 
