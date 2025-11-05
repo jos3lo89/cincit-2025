@@ -1,3 +1,4 @@
+import { sendApprovalNotification } from "@/lib/nodemailer";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
@@ -34,7 +35,24 @@ export const GET = async (req: NextRequest) => {
       data: {
         state,
       },
+      include: {
+        user: {
+          select: {
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
     });
+
+    if (state === "approved") {
+      //todo: hacer un trycatch
+      await sendApprovalNotification(
+        updateInscription.user.email,
+        `${updateInscription.user.firstName} ${updateInscription.user.lastName}`
+      );
+    }
 
     return NextResponse.json(updateInscription, { status: 200 });
   } catch (error) {
