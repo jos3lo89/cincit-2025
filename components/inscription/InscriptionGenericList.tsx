@@ -173,7 +173,7 @@ const InscriptionTableList = ({
     },
     {
       accessorKey: "user.telephone",
-      header: "Institución",
+      header: "Telefono",
       cell: ({ row }) => (
         <div className="flex items-center gap-2 min-w-[180px]">
           <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis block min-w-0 flex-1">
