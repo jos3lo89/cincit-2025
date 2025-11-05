@@ -218,19 +218,6 @@ const InscriptionTableList = ({
       ),
     },
     {
-      accessorKey: "createdAt",
-      header: "Fecha",
-      cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {new Date(row.original.createdAt).toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </span>
-      ),
-    },
-    {
       id: "voucher",
       header: "Voucher",
       cell: ({ row }) => {
@@ -258,6 +245,19 @@ const InscriptionTableList = ({
           </div>
         );
       },
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Fecha",
+      cell: ({ row }) => (
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {new Date(row.original.createdAt).toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
+        </span>
+      ),
     },
     {
       id: "actions",

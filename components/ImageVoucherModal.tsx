@@ -62,9 +62,9 @@ export const ImageVoucherModal = ({
               alt="Voucher completo"
               height={650}
               width={450}
-              className={`w-auto h-auto rounded-lg transition-opacity duration-300 ${
+              className={`rounded-lg transition-opacity duration-300 ${
                 isLoading ? "opacity-0" : "opacity-100"
-              }`}
+              } w-full max-h-[70vh] object-contain`}
               onLoad={() => setIsLoading(false)}
               onError={() => setIsLoading(false)}
             />
