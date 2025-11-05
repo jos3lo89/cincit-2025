@@ -133,6 +133,7 @@ const AttendanceCallPage = () => {
             />
             <div className="flex justify-center items-center gap-3">
               <Button
+                type="button"
                 variant="secondary"
                 onClick={restore}
                 className="text-sm cursor-pointer"
