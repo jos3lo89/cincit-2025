@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -23,24 +23,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   Building,
-  CheckCircle,
   CreditCard,
   Mail,
-  XCircle,
-  Search,
-  X,
   LayoutGrid,
   List,
   Eye,
 } from "lucide-react";
-import { ImageModal } from "./ImageModal";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PacmanLoader } from "react-spinners";
 import type { Inscription } from "@/interfaces/inscription.interface";
 import { ImageVoucherModal } from "../ImageVoucherModal";
+import { getStateLabel, getStateVariant } from "@/utils/state.utils";
 
 type InscriptionListProps = {
   inscriptions: Inscription[];
@@ -87,15 +82,6 @@ const InscriptionList = ({
   const closeImageModal = () => {
     setSelectedImage(null);
   };
-
-  // const debouncedSetGlobalFilter = useMemo(
-  //   () => debounce((value: string) => setGlobalFilter(value), 300),
-  //   []
-  // );
-
-  // useEffect(() => {
-  //   debouncedSetGlobalFilter(searchQuery);
-  // }, [searchQuery, debouncedSetGlobalFilter]);
 
   const onAction = async (id: number, state: "approved" | "rejected") => {
     if (state === "approved") {
@@ -170,24 +156,10 @@ const InscriptionList = ({
       header: "Estado",
       cell: ({ row }) => (
         <Badge
-          variant={
-            row.original.state === "approved"
-              ? "default"
-              : row.original.state === "rejected"
-              ? "destructive"
-              : "secondary"
-          }
+          variant={getStateVariant(row.original.state)}
           className="flex items-center gap-1 w-fit whitespace-nowrap"
         >
-          {row.original.state === "approved" ? (
-            <CheckCircle className="h-3 w-3" />
-          ) : row.original.state === "rejected" ? (
-            <XCircle className="h-3 w-3" />
-          ) : (
-            <XCircle className="h-3 w-3" />
-          )}
-          {row.original.state.charAt(0).toUpperCase() +
-            row.original.state.slice(1)}
+          {getStateLabel(row.original.state)}
         </Badge>
       ),
     },
@@ -290,28 +262,6 @@ const InscriptionList = ({
   return (
     <div className="w-full p-4 space-y-6">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* <div className="relative flex-1 max-w-md w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <label htmlFor="search" className="sr-only"></label>
-          <Input
-            id="search"
-            type="text"
-            placeholder="Buscar por ID, nombre, email, institución o tipo..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2"
-              onClick={() => setSearchQuery("")}
-            >
-              <X className="h-4 w-4 text-muted-foreground" />
-            </Button>
-          )}
-        </div> */}
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
             <Button
@@ -396,32 +346,6 @@ const InscriptionList = ({
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
           </div>
-
-          {/* <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Siguiente
-              </Button>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-muted-foreground">
-                Página {table.getState().pagination.pageIndex + 1} de{" "}
-                {table.getPageCount()}({table.getFilteredRowModel().rows.length}{" "}
-                registros)
-              </span>
-            </div>
-          </div> */}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
@@ -441,24 +365,10 @@ const InscriptionList = ({
                     <div className="flex items-center justify-between gap-3">
                       <CardTitle className="text-lg font-bold">
                         <Badge
-                          variant={
-                            inscription.state === "approved"
-                              ? "default"
-                              : inscription.state === "rejected"
-                              ? "destructive"
-                              : "secondary"
-                          }
-                          className="flex items-center gap-1 whitespace-nowrap"
+                          variant={getStateVariant(row.original.state)}
+                          className="flex items-center gap-1 w-fit whitespace-nowrap"
                         >
-                          {inscription.state === "approved" ? (
-                            <CheckCircle className="h-3 w-3" />
-                          ) : inscription.state === "rejected" ? (
-                            <XCircle className="h-3 w-3" />
-                          ) : (
-                            <XCircle className="h-3 w-3" />
-                          )}
-                          {inscription.state.charAt(0).toUpperCase() +
-                            inscription.state.slice(1)}
+                          {getStateLabel(row.original.state)}
                         </Badge>
                       </CardTitle>
                     </div>
@@ -531,10 +441,6 @@ const InscriptionList = ({
                       <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
                         Voucher de Pago
                       </h4>
-                      {/* <ImageModal
-                        imagePath={inscription.voucher.publicUrl}
-                        altText={`Voucher de pago - Inscripción #${inscription.id}`}
-                      /> */}
                       <Button
                         variant="outline"
                         size="sm"
@@ -555,8 +461,6 @@ const InscriptionList = ({
                         onClose={closeImageModal}
                       />
                     </div>
-
-                    {/* Actions */}
                   </CardContent>
                 </Card>
               );

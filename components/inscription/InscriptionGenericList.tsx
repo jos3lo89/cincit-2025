@@ -51,6 +51,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getStateLabel, getStateVariant } from "@/utils/state.utils";
 
 type InscriptionListProps = {
   inscriptions: Inscription[];
@@ -64,14 +65,6 @@ interface LoadingActions {
   rejecting: number | null;
 }
 
-// const debounce = (func: (...args: any[]) => void, delay: number) => {
-//   let timeoutId: NodeJS.Timeout;
-//   return (...args: any[]) => {
-//     clearTimeout(timeoutId);
-//     timeoutId = setTimeout(() => func(...args), delay);
-//   };
-// };
-
 const InscriptionTableList = ({
   inscriptions,
   handleAction,
@@ -82,7 +75,7 @@ const InscriptionTableList = ({
     approving: null,
     rejecting: null,
   });
-  // const [searchQuery, setSearchQuery] = useState("");
+
   const [viewMode, setViewMode] = useState<"table" | "card">("table");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -196,24 +189,10 @@ const InscriptionTableList = ({
       header: "Estado",
       cell: ({ row }) => (
         <Badge
-          variant={
-            row.original.state === "approved"
-              ? "default"
-              : row.original.state === "rejected"
-              ? "destructive"
-              : "secondary"
-          }
+          variant={getStateVariant(row.original.state)}
           className="flex items-center gap-1 w-fit whitespace-nowrap"
         >
-          {row.original.state === "approved" ? (
-            <CheckCircle className="h-3 w-3" />
-          ) : row.original.state === "rejected" ? (
-            <XCircle className="h-3 w-3" />
-          ) : (
-            <XCircle className="h-3 w-3" />
-          )}
-          {row.original.state.charAt(0).toUpperCase() +
-            row.original.state.slice(1)}
+          {getStateLabel(row.original.state)}
         </Badge>
       ),
     },
@@ -312,14 +291,6 @@ const InscriptionTableList = ({
                   <CheckCircle className="h-3 w-3" />
                   <span className="hidden lg:inline">Aprobar</span>
                 </Button>
-                {/* <Button
-                  className="cursor-pointer"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDeleteUser(row.original.user.dni)}
-                >
-                  <Trash2 />
-                </Button> */}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -341,7 +312,7 @@ const InscriptionTableList = ({
                         ¿Estás realmente seguro?
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        Esta acción es irreversible. El usuario con DNI{" "}
+                        Esta acción es irreversible. El usuario con DNI
                         {row.original.user.dni} y todos sus datos
                         (inscripciones, vouchers) se eliminarán por completo.
                       </AlertDialogDescription>
@@ -419,7 +390,6 @@ const InscriptionTableList = ({
 
   return (
     <div className="w-full p-4 space-y-6">
-      {/* Search and View Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
@@ -505,32 +475,6 @@ const InscriptionTableList = ({
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
           </div>
-
-          {/* <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Siguiente
-              </Button>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-muted-foreground">
-                Página {table.getState().pagination.pageIndex + 1} de{" "}
-                {table.getPageCount()}({table.getFilteredRowModel().rows.length}{" "}
-                registros)
-              </span>
-            </div>
-          </div> */}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
@@ -552,24 +496,10 @@ const InscriptionTableList = ({
                         Inscripción
                       </CardTitle>
                       <Badge
-                        variant={
-                          inscription.state === "approved"
-                            ? "default"
-                            : inscription.state === "rejected"
-                            ? "destructive"
-                            : "secondary"
-                        }
-                        className="flex items-center gap-1 whitespace-nowrap"
+                        variant={getStateVariant(inscription.state)}
+                        className="flex items-center gap-1 w-fit whitespace-nowrap"
                       >
-                        {inscription.state === "approved" ? (
-                          <CheckCircle className="h-3 w-3" />
-                        ) : inscription.state === "rejected" ? (
-                          <XCircle className="h-3 w-3" />
-                        ) : (
-                          <XCircle className="h-3 w-3" />
-                        )}
-                        {inscription.state.charAt(0).toUpperCase() +
-                          inscription.state.slice(1)}
+                        {getStateLabel(inscription.state)}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -582,7 +512,7 @@ const InscriptionTableList = ({
                         <div className="flex items-center gap-2">
                           <CreditCard className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <span className="font-medium overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1">
-                            {inscription.user.firstName}{" "}
+                            {inscription.user.firstName}
                             {inscription.user.lastName}
                           </span>
                         </div>
@@ -613,13 +543,13 @@ const InscriptionTableList = ({
                       </h4>
                       <div className="space-y-2 text-sm">
                         <div>
-                          <span className="font-medium">Tipo:</span>{" "}
+                          <span className="font-medium">Tipo:</span>
                           <span className="text-xs overflow-hidden text-ellipsis whitespace-nowrap inline-block max-w-[200px]">
                             {inscription.inscriptionType}
                           </span>
                         </div>
                         <div>
-                          <span className="font-medium">Fecha:</span>{" "}
+                          <span className="font-medium">Fecha:</span>
                           <span className="text-xs whitespace-nowrap">
                             {new Date(inscription.createdAt).toLocaleDateString(
                               "es-ES",
@@ -638,10 +568,6 @@ const InscriptionTableList = ({
                       <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
                         Voucher de Pago
                       </h4>
-                      {/* <ImageModal
-                        imagePath={inscription.voucher.publicUrl}
-                        altText={`Voucher de pago - Inscripción #${inscription.id}`}
-                      /> */}
 
                       <Button
                         variant="outline"
@@ -733,7 +659,7 @@ const InscriptionTableList = ({
                                 ¿Estás realmente seguro?
                               </AlertDialogTitle>
                               <AlertDialogDescription>
-                                Esta acción es irreversible. El usuario con DNI{" "}
+                                Esta acción es irreversible. El usuario con DNI
                                 {inscription.user.dni} y todos sus datos
                                 (inscripciones, vouchers) se eliminarán por
                                 completo.

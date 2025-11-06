@@ -55,8 +55,6 @@ const roleColors = {
   STAFF: "default",
 } as const;
 
-type NonAdminRoles = Exclude<Role, "ADMINISTRATOR">;
-
 const ChangeRolePage = () => {
   const [user, setUser] = useState<UserInterfaceI | null>(null);
   const [searchAttempted, setSearchAttempted] = useState(false);
@@ -105,7 +103,6 @@ const ChangeRolePage = () => {
       const data = await res.json();
       setUser(data);
       toast.dismiss(loadingToast);
-      // toast.success("Usuario encontrado.");
     } catch (error) {
       toast.dismiss(loadingToast);
       console.error(error);

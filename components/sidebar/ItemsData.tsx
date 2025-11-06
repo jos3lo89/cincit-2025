@@ -123,6 +123,10 @@ export const sideBarData = {
         icon: UserPlus,
         items: [
           {
+            title: "Buscar",
+            url: "/inscription/search",
+          },
+          {
             title: "Todos",
             url: "/inscription/all",
           },

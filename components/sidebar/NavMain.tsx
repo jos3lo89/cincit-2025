@@ -1,11 +1,8 @@
-// NavMain.tsx
-
-// 1. Convertido a Componente de Cliente para poder usar hooks
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // 2. Hook para leer la ruta actual
+import { usePathname } from "next/navigation";
 import {
   Collapsible,
   CollapsibleContent,
@@ -43,7 +40,6 @@ export function NavMain({ role }: { role?: Role }) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
-  // 2. ASIGNACIÓN CORRECTA: `menuItems` es un array de `MenuItem`
   const menuItems: MenuItem[] = (role && sideBarData.navMain[role]) ?? [];
 
   const handleLinkClick = () => {
@@ -52,7 +48,6 @@ export function NavMain({ role }: { role?: Role }) {
     }
   };
 
-  // Añadimos una comprobación para evitar errores si no hay items
   if (!menuItems || menuItems.length === 0) {
     return null;
   }
@@ -62,7 +57,6 @@ export function NavMain({ role }: { role?: Role }) {
       <SidebarGroupLabel>Menu</SidebarGroupLabel>
       <SidebarMenu>
         {menuItems.map((item) => {
-          // 4. Lógica para determinar si el menú desplegable está activo
           const isParentActive =
             item.items?.some((subItem) => pathname === subItem.url) ?? false;
 
@@ -70,12 +64,11 @@ export function NavMain({ role }: { role?: Role }) {
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={isParentActive} // Se abrirá si un hijo está activo
+              defaultOpen={isParentActive}
               className="group/collapsible"
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  {/* Se resalta el botón principal si un hijo está activo */}
                   <SidebarMenuButton
                     tooltip={item.title}
                     isActive={isParentActive}
@@ -91,7 +84,7 @@ export function NavMain({ role }: { role?: Role }) {
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton
                           asChild
-                          isActive={pathname === subItem.url} // 5. Resaltado del sub-item activo
+                          isActive={pathname === subItem.url}
                         >
                           <Link href={subItem.url} onClick={handleLinkClick}>
                             {subItem.title}
@@ -108,7 +101,7 @@ export function NavMain({ role }: { role?: Role }) {
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
-                isActive={pathname === item.url} // 6. Resaltado del item principal activo
+                isActive={pathname === item.url}
               >
                 <Link href={item.url} onClick={handleLinkClick}>
                   {item.icon && <item.icon />}
