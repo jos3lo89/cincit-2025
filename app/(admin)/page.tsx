@@ -1,50 +1,39 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, FileText, CheckCircle2, AlertCircle } from "lucide-react";
-import prisma from "@/lib/prisma";
-import { Role, InscriptionState } from "@prisma/client";
 import Link from "next/link";
+import { Role } from "@prisma/client";
+import { getDashboardStats } from "@/actions/dashboard";
+import { InscriptionsBarChart } from "@/components/dashboard/InscriptionsBarChart";
+import { UsersPieChart } from "@/components/dashboard/UsersPieChart";
+
+const roleDisplayNames: Record<Role, string> = {
+  ADMINISTRATOR: "Admins",
+  INSCRIBER: "Inscriptores",
+  PARTICIPANT: "Participantes",
+  STAFF: "Staff",
+};
 
 export default async function DashboardPage() {
-  const [totalUsers, usersByRole, inscriptionsByState] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.groupBy({
-      by: ["role"],
-      _count: {
-        role: true,
-      },
-    }),
-    prisma.inscription.groupBy({
-      by: ["state"],
-      _count: {
-        state: true,
-      },
-    }),
-  ]);
+  const stats = await getDashboardStats();
 
-  const roleCounts: Record<Role, number> = {
-    ADMINISTRATOR: 0,
-    INSCRIBER: 0,
-    PARTICIPANT: 0,
-    STAFF: 0,
-  };
-  usersByRole.forEach((item) => {
-    roleCounts[item.role] = item._count.role;
-  });
+  const inscriptionsChartData = [
+    { name: "Pendientes", conteo: stats.inscriptionStateCounts.pending },
+    { name: "Aprobadas", conteo: stats.inscriptionStateCounts.approved },
+    { name: "Rechazadas", conteo: stats.inscriptionStateCounts.rejected },
+  ];
 
-  const inscriptionStateCounts: Record<InscriptionState, number> = {
-    approved: 0,
-    pending: 0,
-    rejected: 0,
-  };
-  inscriptionsByState.forEach((item) => {
-    inscriptionStateCounts[item.state] = item._count.state;
-  });
+  const usersChartData = Object.entries(stats.roleCounts)
+    .filter(([, value]) => value > 0)
+    .map(([role, value]) => ({
+      name: roleDisplayNames[role as Role] || role,
+      value: value,
+    }));
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Link href="/inscription/all">
-          <Card className="rounded-lg shadow-md w-full h-full">
+        <Link href="/inscription/all" className="flex">
+          <Card className="rounded-lg shadow-md w-full h-full transition-transform hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Usuarios Totales
@@ -52,17 +41,16 @@ export default async function DashboardPage() {
               <User className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalUsers}</div>
+              <div className="text-2xl font-bold">{stats.totalUsers}</div>
               <p className="text-xs text-muted-foreground">
-                {roleCounts.ADMINISTRATOR} Administradores,{" "}
-                {roleCounts.INSCRIBER} Inscriptores, {roleCounts.STAFF} Staff
+                {stats.roleCounts.PARTICIPANT} Participantes
               </p>
             </CardContent>
           </Card>
         </Link>
 
-        <Link href="/inscription/pending">
-          <Card className="rounded-lg shadow-md w-full h-full">
+        <Link href="/inscription/pending" className="flex">
+          <Card className="rounded-lg shadow-md w-full h-full transition-transform hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Inscripciones Pendientes
@@ -70,8 +58,8 @@ export default async function DashboardPage() {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {inscriptionStateCounts.pending}
+              <div className="text-2xl font-bold text-yellow-600">
+                {stats.inscriptionStateCounts.pending}
               </div>
               <p className="text-xs text-muted-foreground">
                 Pendientes de aprobación
@@ -80,8 +68,8 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/inscription/approved">
-          <Card className="rounded-lg shadow-md w-full h-full">
+        <Link href="/inscription/approved" className="flex">
+          <Card className="rounded-lg shadow-md w-full h-full transition-transform hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Inscripciones Aprobadas
@@ -89,8 +77,8 @@ export default async function DashboardPage() {
               <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {inscriptionStateCounts.approved}
+              <div className="text-2xl font-bold text-green-600">
+                {stats.inscriptionStateCounts.approved}
               </div>
               <p className="text-xs text-muted-foreground">
                 Aprobadas y listas
@@ -99,8 +87,8 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/inscription/rejected">
-          <Card className="rounded-lg shadow-md w-full h-full">
+        <Link href="/inscription/rejected" className="flex">
+          <Card className="rounded-lg shadow-md w-full h-full transition-transform hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Inscripciones Rechazadas
@@ -108,15 +96,20 @@ export default async function DashboardPage() {
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {inscriptionStateCounts.rejected}
+              <div className="text-2xl font-bold text-red-600">
+                {stats.inscriptionStateCounts.rejected}
               </div>
               <p className="text-xs text-muted-foreground">
-                Rechazadas por falta de información
+                Rechazadas por admin
               </p>
             </CardContent>
           </Card>
         </Link>
+      </div>
+
+      <div className="grid gap-4 mt-8 md:grid-cols-1 lg:grid-cols-2">
+        <InscriptionsBarChart data={inscriptionsChartData} />
+        <UsersPieChart data={usersChartData} />
       </div>
     </div>
   );
