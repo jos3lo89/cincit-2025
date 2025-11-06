@@ -23,9 +23,13 @@ import {
   downloadAttendanceReportExcel,
 } from "@/utils/excel-utils";
 
+const TICKETS_DOWNLOAD_URL = process.env
+  .NEXT_PUBLIC_TICKETS_DOWNLOAD_URL as string;
+
 const ReportPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAttendanceLoading, setIsAttendanceLoading] = useState(false);
+  const [isTicketsLoading, setIsTicketsLoading] = useState(false);
 
   const handleDownloadReport = async () => {
     setIsLoading(true);
@@ -97,6 +101,37 @@ const ReportPage = () => {
     }
   };
 
+  const handleDownloadTickets = () => {
+    setIsTicketsLoading(true);
+    const loadingToast = toast.loading("Iniciando descarga de tickets...");
+
+    try {
+      const link = document.createElement("a");
+      link.href = TICKETS_DOWNLOAD_URL;
+
+      link.setAttribute("download", "tickets_participantes.zip");
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("¡Descarga iniciada!", {
+        id: loadingToast,
+        description: "El archivo ZIP de tickets ha comenzado a descargarse.",
+      });
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Error al iniciar la descarga", {
+        id: loadingToast,
+        description: error.message || "No se pudo iniciar la descarga.",
+      });
+    } finally {
+      setTimeout(() => {
+        setIsTicketsLoading(false);
+      }, 500);
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-3xl py-10">
       <Card>
@@ -154,6 +189,30 @@ const ReportPage = () => {
               ) : (
                 <>
                   <Download className="mr-2 h-4 w-4" /> Descargar
+                </>
+              )}
+            </Button>
+          </div>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between rounded-lg border p-4 space-y-2 md:space-y-0 md:space-x-4">
+            <div className="flex-1">
+              <h3 className="font-semibold">Tickets de Participantes</h3>
+              <p className="text-sm text-muted-foreground">
+                Descarga un archivo ZIP con todas las imágenes de los tickets.
+              </p>
+            </div>
+            <Button
+              onClick={handleDownloadTickets}
+              disabled={isTicketsLoading}
+              className="w-full md:w-auto"
+            >
+              {isTicketsLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Iniciando...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" /> Descargar ZIP
                 </>
               )}
             </Button>
