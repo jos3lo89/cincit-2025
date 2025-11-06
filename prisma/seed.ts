@@ -3,15 +3,16 @@ import { passwordHashed } from "@/lib/bcrypt";
 import { faker } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
+const pwdDefault = process.env.PASSWORD_DEFAULT_ACCOUNT;
 
 async function userRegister() {
   // Crear usuario administrador 1
   await prisma.user.upsert({
-    where: { email: "admin1@admin.com" },
+    where: { email: "admin1@cincit.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
-      password: await passwordHashed("admin321"),
+      password: await passwordHashed(pwdDefault),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: "admin1@cincit.com",
@@ -23,11 +24,11 @@ async function userRegister() {
 
   // Crear usuario administrador 2
   await prisma.user.upsert({
-    where: { email: "admin2@admin.com" },
+    where: { email: "admin2@cincit.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
-      password: await passwordHashed("admin321"),
+      password: await passwordHashed(pwdDefault),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: "admin2@cincit.com",
@@ -39,11 +40,11 @@ async function userRegister() {
 
   // Crear usuario administrador 2
   await prisma.user.upsert({
-    where: { email: "admin3@admin.com" },
+    where: { email: "admin3@cincit.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
-      password: await passwordHashed("admin321"),
+      password: await passwordHashed(pwdDefault),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: "admin3@cincit.com",
@@ -55,11 +56,11 @@ async function userRegister() {
 
   // Crear usuario inscriptor
   await prisma.user.upsert({
-    where: { email: "inscriptor1@inscriptor.com" },
+    where: { email: "inscriptor1@cincit.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
-      password: await passwordHashed("inscriptor321"),
+      password: await passwordHashed(pwdDefault),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: "inscriptor1@cincit.com",
@@ -71,11 +72,11 @@ async function userRegister() {
 
   // Crear usuario inscriptor 2
   await prisma.user.upsert({
-    where: { email: "inscriptor2@inscriptor.com" },
+    where: { email: "inscriptor2@cincit.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
-      password: await passwordHashed("inscriptor321"),
+      password: await passwordHashed(pwdDefault),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: "inscriptor2@cincit.com",
@@ -90,7 +91,7 @@ async function userRegister() {
     update: {},
     create: {
       dni: faker.string.numeric(8),
-      password: await passwordHashed("inscriptor321"),
+      password: await passwordHashed(pwdDefault),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: "inscriptor3@cincit.com",
@@ -105,7 +106,7 @@ async function userRegister() {
     update: {},
     create: {
       dni: faker.string.numeric(8),
-      password: await passwordHashed("inscriptor321"),
+      password: await passwordHashed(pwdDefault),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: "inscriptor4@cincit.com",
