@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ExternalLink, Eye, Loader } from "lucide-react";
+import { ExternalLink, Loader } from "lucide-react";
 import {
   Dialog,
   DialogContent,

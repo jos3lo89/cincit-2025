@@ -196,10 +196,7 @@ const AttendanceCallPage = () => {
       {attendance && (
         <div className="max-w-sm mx-auto text-center space-y-3">
           <div className="rounded-md">
-            <p className="text-primary">
-              {/* <span>{formatDate(attendance.date)} </span>- */}
-              {/* <span> {getbadgeLabel(attendance.attendanceType)}</span> */}
-            </p>
+            <p className="text-primary"></p>
           </div>
           <Button
             onClick={handleMarkAttendance}

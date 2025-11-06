@@ -1,4 +1,3 @@
-// Tu ruta original, por ejemplo: src/app/admin/search/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ImageVoucherModal } from "@/components/ImageVoucherModal";
+import { getStateLabel, getStateVariant } from "@/utils/state.utils";
 
 type InscriptionWithUser = {
   id: string;
@@ -50,11 +50,8 @@ type InscriptionWithUser = {
 
 const SearchInscriptionPage = () => {
   const [results, setResults] = useState<InscriptionWithUser[]>([]);
-  // El único estado necesario para el modal es saber qué imagen mostrar
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [ticketNumber, setTicketNumber] = useState<string | null>(null);
-
-  // 2. ELIMINAMOS los estados 'imageLoading' y 'modalImageLoading' que ya no son necesarios aquí
 
   const {
     handleSubmit,
@@ -107,7 +104,6 @@ const SearchInscriptionPage = () => {
     toast.info("Búsqueda reiniciada");
   };
 
-  // 3. SIMPLIFICAMOS las funciones para abrir y cerrar el modal
   const openImageModal = (imageUrl: string, numTicket: string) => {
     setSelectedImage(imageUrl);
     setTicketNumber(numTicket);
@@ -115,32 +111,6 @@ const SearchInscriptionPage = () => {
 
   const closeImageModal = () => {
     setSelectedImage(null);
-  };
-
-  const getStateVariant = (state: InscriptionState) => {
-    switch (state) {
-      case "approved":
-        return "default";
-      case "pending":
-        return "secondary";
-      case "rejected":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
-  const getStateLabel = (state: InscriptionState) => {
-    switch (state) {
-      case "approved":
-        return "Aprobado";
-      case "pending":
-        return "Pendiente";
-      case "rejected":
-        return "Rechazado";
-      default:
-        return state;
-    }
   };
 
   return (

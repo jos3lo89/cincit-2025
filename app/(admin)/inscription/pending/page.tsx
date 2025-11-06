@@ -47,31 +47,6 @@ const PendingInscriptionsPage = () => {
     setCurrentPage(page);
   };
 
-  // const handleAction = async (id: number, state: string) => {
-  //   const isLoading = toast.loading("Cambiando estado...");
-  //   try {
-  //     const res = await fetch(
-  //       `/api/inscription/action?id=${id}&state=${state}`
-  //     );
-  //     const data = await res.json();
-
-  //     if (!res.ok) {
-  //       throw new Error(
-  //         data.message || "Error canbiar el estado de la inscripción"
-  //       );
-  //     }
-  //   } catch (error) {
-  //     if (error instanceof Error) {
-  //       toast.error(error.message);
-  //     } else {
-  //       toast.error("Error en la solicitud");
-  //     }
-  //   } finally {
-  //     fetchInscriptions(inscriptions.length === 1 ? 1 : currentPage);
-  //     toast.dismiss(isLoading);
-  //   }
-  // };
-
   const handleAction = async (id: number, state: string) => {
     const isLoading = toast.loading("Cambiando estado...");
 

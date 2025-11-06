@@ -20,7 +20,6 @@ export const formatDatePe = (
     }).format(d);
   }
 
-  // default: datetime
   return new Intl.DateTimeFormat("es-PE", {
     dateStyle: "short",
     timeStyle: "medium",
