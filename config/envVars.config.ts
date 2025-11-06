@@ -15,6 +15,7 @@ const envVars = object({
   NEXT_PUBLIC_SUPABASE_URL: string(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: string(),
   NEXT_PUBLIC_URL_IMG_SERVICE: string(),
+  PASSWORD_DEFAULT_ACCOUNT: string(),
 });
 
 envVars.parse(process.env);
