@@ -7,14 +7,14 @@ const prisma = new PrismaClient();
 async function userRegister() {
   // Crear usuario administrador 1
   await prisma.user.upsert({
-    where: { email: "admin1@cincit.com" },
+    where: { email: "admin1@admin.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
       password: await passwordHashed("admin321"),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
-      email: "admin1@admin.com",
+      email: "admin1@cincit.com",
       telephone: faker.string.numeric(9),
       institution: "UNAJMA",
       role: Role.ADMINISTRATOR,
@@ -23,14 +23,30 @@ async function userRegister() {
 
   // Crear usuario administrador 2
   await prisma.user.upsert({
-    where: { email: "admin2@cincit.com" },
+    where: { email: "admin2@admin.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
       password: await passwordHashed("admin321"),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
-      email: "admin2@admin.com",
+      email: "admin2@cincit.com",
+      telephone: faker.string.numeric(9),
+      institution: "UNAJMA",
+      role: Role.ADMINISTRATOR,
+    },
+  });
+
+  // Crear usuario administrador 2
+  await prisma.user.upsert({
+    where: { email: "admin3@admin.com" },
+    update: {},
+    create: {
+      dni: faker.string.numeric(8),
+      password: await passwordHashed("admin321"),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      email: "admin3@cincit.com",
       telephone: faker.string.numeric(9),
       institution: "UNAJMA",
       role: Role.ADMINISTRATOR,
@@ -39,14 +55,14 @@ async function userRegister() {
 
   // Crear usuario inscriptor
   await prisma.user.upsert({
-    where: { email: "inscriptor1@cincit.com" },
+    where: { email: "inscriptor1@inscriptor.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
       password: await passwordHashed("inscriptor321"),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
-      email: "inscriptor1@inscriptor.com",
+      email: "inscriptor1@cincit.com",
       telephone: faker.string.numeric(9),
       institution: "UNAJMA",
       role: Role.INSCRIBER,
@@ -55,14 +71,44 @@ async function userRegister() {
 
   // Crear usuario inscriptor 2
   await prisma.user.upsert({
-    where: { email: "inscriptor2@cincit.com" },
+    where: { email: "inscriptor2@inscriptor.com" },
     update: {},
     create: {
       dni: faker.string.numeric(8),
       password: await passwordHashed("inscriptor321"),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
-      email: "inscriptor2@inscriptor.com",
+      email: "inscriptor2@cincit.com",
+      telephone: faker.string.numeric(9),
+      institution: "UNAJMA",
+      role: Role.INSCRIBER,
+    },
+  });
+  // Crear usuario inscriptor 3
+  await prisma.user.upsert({
+    where: { email: "inscriptor3@cincit.com" },
+    update: {},
+    create: {
+      dni: faker.string.numeric(8),
+      password: await passwordHashed("inscriptor321"),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      email: "inscriptor3@cincit.com",
+      telephone: faker.string.numeric(9),
+      institution: "UNAJMA",
+      role: Role.INSCRIBER,
+    },
+  });
+  // Crear usuario inscriptor 4
+  await prisma.user.upsert({
+    where: { email: "inscriptor4@cincit.com" },
+    update: {},
+    create: {
+      dni: faker.string.numeric(8),
+      password: await passwordHashed("inscriptor321"),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      email: "inscriptor4@cincit.com",
       telephone: faker.string.numeric(9),
       institution: "UNAJMA",
       role: Role.INSCRIBER,
