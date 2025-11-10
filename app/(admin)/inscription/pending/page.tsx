@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Inscription, Meta } from "@/interfaces/inscription.interface";
 
@@ -98,6 +98,43 @@ const PendingInscriptionsPage = () => {
     }
   }, [inscriptions]);
 
+  const paginationPages = useMemo(() => {
+    if (!meta || meta.lastPage <= 1) {
+      return [];
+    }
+
+    const { lastPage } = meta;
+    const DOTS = "...";
+    const MAX_PAGES_SHOWN = 5;
+
+    if (lastPage <= MAX_PAGES_SHOWN) {
+      return Array.from({ length: lastPage }, (_, i) => i + 1);
+    }
+
+    const pagesToShow = new Set<number>();
+
+    pagesToShow.add(1);
+    pagesToShow.add(currentPage);
+
+    if (currentPage > 1) pagesToShow.add(currentPage - 1);
+    if (currentPage < lastPage) pagesToShow.add(currentPage + 1);
+
+    pagesToShow.add(lastPage);
+
+    const sortedPages = Array.from(pagesToShow).sort((a, b) => a - b);
+    const finalPages: (number | string)[] = [];
+
+    let prevPage = 0;
+    for (const page of sortedPages) {
+      if (prevPage !== 0 && page > prevPage + 1) {
+        finalPages.push(DOTS);
+      }
+      finalPages.push(page);
+      prevPage = page;
+    }
+
+    return finalPages;
+  }, [currentPage, meta]);
   return (
     <div className="">
       <div className="mb-6">
@@ -137,13 +174,21 @@ const PendingInscriptionsPage = () => {
           </Button>
 
           <div className="flex items-center space-x-1">
-            {Array.from({ length: meta.lastPage }, (_, i) => i + 1).map(
-              (pageNumber) => (
+            {paginationPages.map((pageNumber, index) =>
+              typeof pageNumber === "string" ? (
+                <span
+                  key={`dots-${index}`}
+                  className="flex items-center justify-center px-2 py-1 text-sm h-9 min-w-[40px]"
+                >
+                  {pageNumber}
+                </span>
+              ) : (
                 <Button
                   key={pageNumber}
                   onClick={() => handlePageChange(pageNumber)}
                   disabled={currentPage === pageNumber}
                   size="sm"
+                  variant={currentPage === pageNumber ? "default" : "outline"}
                   className="min-w-[40px]"
                 >
                   {pageNumber}
