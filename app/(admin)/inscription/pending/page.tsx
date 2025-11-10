@@ -105,7 +105,7 @@ const PendingInscriptionsPage = () => {
 
     const { lastPage } = meta;
     const DOTS = "...";
-    const MAX_PAGES_SHOWN = 5;
+    const MAX_PAGES_SHOWN = 3;
 
     if (lastPage <= MAX_PAGES_SHOWN) {
       return Array.from({ length: lastPage }, (_, i) => i + 1);
@@ -170,7 +170,6 @@ const PendingInscriptionsPage = () => {
             className="flex items-center gap-1 cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
-            Anterior
           </Button>
 
           <div className="flex items-center space-x-1">
@@ -203,7 +202,6 @@ const PendingInscriptionsPage = () => {
             variant="outline"
             className="flex items-center gap-1 cursor-pointer"
           >
-            Siguiente
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
